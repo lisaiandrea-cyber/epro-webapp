@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>U17 ePRO Basketball</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-full flex flex-col justify-between pb-20"
+      x-data="{ 
+        activeTab: 'home',
+        showLoginModal: false,
+        isLoggedIn: false,
+        isAdmin: false,
+        themeColor: '#f97316',
+        matches: [],
+        news: [],
+        roster: [],
+        
+        // Form Roster & News
+        newMember: { name: '', role: '', number: '', category: 'giocatori', imageUrl: '' },
+        newNews: { title: '', content: '', tag: 'Club News', imageUrl: '' },
+
+        async init() {
+          const res = await fetch('/api/data');
+          const data = await res.json();
+          this.matches = data.matches;
+          this.news = data.news;
+          this.roster = data.roster;
+          this.themeColor = data.themeColor || '#f97316';
+        },
+
+        async uploadImage(event, target) {
+          const file = event.target.files[0];
+          const formData = new FormData();
+          formData.append('image', file);
+
+          const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+          const data = await res.json();
+          if(target === 'roster') this.newMember.imageUrl = data.imageUrl;
+          if(target === 'news') this.newNews.imageUrl = data.imageUrl;
+        },
+
+        async saveMember() {
+          const res = await fetch('/api/admin/roster', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(this.newMember)
+          });
+          const data = await res.json();
+          this.roster = data.roster;
+          alert('Membro salvato!');
+          this.newMember = { name: '', role: '', number: '', category: 'giocatori', imageUrl: '' };
+        },
+
+        async deleteMember(id) {
+          const res = await fetch(`/api/admin/roster/${id}`, { method: 'DELETE' });
+          const data = await res.json();
+          this.roster = data.roster;
+        },
+
+        async saveNews() {
+          const res = await fetch('/api/admin/news', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(this.newNews)
+          });
+          const data = await res.json();
+          this.news = data.news;
+          alert('News pubblicata!');
+          this.newNews = { title: '', content: '', tag: 'Club News', imageUrl: '' };
+        },
+
+        async updateTheme(color) {
+          this.themeColor = color;
+          await fetch('/api/admin/theme', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ color })
+          });
+        }
+      }">
+
+  <!-- HEADER -->
+  <header class="bg-slate-900/80 border-b border-slate-800 sticky top-0 z-50 px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div :style="`background-color: ${themeColor}`" class="w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-white text-lg shadow-lg">eP</div>
+      <h1 class="text-lg font-bold">U17 <span :style="`color: ${themeColor}`">ePRO</span></h1>
+    </div>
+    <button @click="showLoginModal = true" class="p-2 bg-slate-800 rounded-full text-slate-300">⚙️</button>
+  </header>
+
+  <main class="flex-1 max-w-md mx-auto w-full px-4 py-6">
+
+    <!-- ================= NEWS TAB ================= -->
+    <section x-show="activeTab === 'news'" class="space-y-4">
+      <template x-for="item in news" :key="item.id">
+        <div class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800">
+          <template x-if="item.imageUrl">
+            <img :src="item.imageUrl" class="w-full h-48 object-cover">
+          </template>
+          <div class="p-4">
+            <span :style="`background-color: ${themeColor}`" class="text-[9px] text-white font-bold px-2 py-0.5 rounded" x-text="item.tag"></span>
+            <h3 class="font-bold text-lg mt-2" x-text="item.title"></h3>
+            <p class="text-xs text-slate-300 mt-2" x-text="item.content"></p>
+          </div>
+        </div>
+      </template>
+    </section>
+
+    <!-- ================= ROSTER TAB ================= -->
+    <section x-show="activeTab === 'roster'" class="space-y-4">
+      <div class="grid grid-cols-2 gap-3">
+        <template x-for="member in roster" :key="member.id">
+          <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 flex flex-col items-center relative">
+            <button x-show="isAdmin" @click="deleteMember(member.id)" class="absolute top-2 right-2 text-red-500 font-bold text-xs">✕</button>
+            <img :src="member.imageUrl || 'https://placehold.co/150'" class="w-16 h-16 rounded-full object-cover border border-slate-700 mb-2">
+            <h4 class="font-bold text-sm" x-text="member.name"></h4>
+            <p class="text-xs text-slate-400" x-text="member.role"></p>
+          </div>
+        </template>
+      </div>
+    </section>
+
+    <!-- ================= ADMIN TAB ================= -->
+    <section x-show="activeTab === 'admin' && isAdmin" class="space-y-6">
+      <h2 class="text-xl font-bold">Pannello Admin</h2>
+
+      <!-- Personalizzazione Colore Tema -->
+      <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+        <label class="block text-xs font-bold uppercase text-slate-400">Colore Principale dell'App</label>
+        <div class="flex items-center space-x-4">
+          <input type="color" :value="themeColor" @change="updateTheme($event.target.value)" class="w-12 h-12 rounded bg-transparent cursor-pointer">
+          <span class="text-xs text-slate-300" x-text="'Selezionato: ' + themeColor"></span>
+        </div>
+      </div>
+
+      <!-- Nuovo Membro Roster -->
+      <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+        <h3 class="text-sm font-bold uppercase text-slate-300">Aggiungi al Roster/Staff</h3>
+        <input type="text" x-model="newMember.name" placeholder="Nome e Cognome" class="w-full bg-slate-950 p-2 text-xs rounded border border-slate-800">
+        <input type="text" x-model="newMember.role" placeholder="Ruolo (es. Ala / Assistente)" class="w-full bg-slate-950 p-2 text-xs rounded border border-slate-800">
+        <select x-model="newMember.category" class="w-full bg-slate-950 p-2 text-xs rounded border border-slate-800">
+          <option value="giocatori">Giocatore (Roster)</option>
+          <option value="staff">Staff Tecnico</option>
+        </select>
+        <!-- Caricamento Foto Membro -->
+        <div>
+          <label class="block text-[10px] text-slate-400 font-semibold mb-1">Foto Membro</label>
+          <input type="file" @change="uploadImage($event, 'roster')" class="text-xs text-slate-400 file:bg-slate-800 file:text-white file:border-none file:px-3 file:py-1 file:rounded file:cursor-pointer">
+        </div>
+        <button @click="saveMember()" :style="`background-color: ${themeColor}`" class="w-full text-white font-bold py-2 rounded text-xs">Salva nel Roster</button>
+      </div>
+
+      <!-- Nuova Notizia con Foto -->
+      <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+        <h3 class="text-sm font-bold uppercase text-slate-300">Pubblica una Notizia</h3>
+        <input type="text" x-model="newNews.title" placeholder="Titolo Notizia" class="w-full bg-slate-950 p-2 text-xs rounded border border-slate-800">
+        <textarea x-model="newNews.content" placeholder="Contenuto..." class="w-full bg-slate-950 p-2 text-xs rounded border border-slate-800 h-20"></textarea>
+        <div>
+          <label class="block text-[10px] text-slate-400 font-semibold mb-1">Immagine News</label>
+          <input type="file" @change="uploadImage($event, 'news')" class="text-xs text-slate-400 file:bg-slate-800 file:text-white file:border-none file:px-3 file:py-1 file:rounded file:cursor-pointer">
+        </div>
+        <button @click="saveNews()" :style="`background-color: ${themeColor}`" class="w-full text-white font-bold py-2 rounded text-xs">Pubblica News</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM BAR (Navigazione) -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 py-2 px-4 flex justify-around items-center max-w-md mx-auto">
+    <button @click="activeTab = 'news'" :class="activeTab === 'news' ? 'text-orange-500' : 'text-slate-400'" class="flex flex-col items-center flex-1">
+      <span class="text-[10px] font-semibold">News</span>
+    </button>
+    <button @click="activeTab = 'roster'" :class="activeTab === 'roster' ? 'text-orange-500' : 'text-slate-400'" class="flex flex-col items-center flex-1">
+      <span class="text-[10px] font-semibold">Roster</span>
+    </button>
+    <button x-show="isAdmin" @click="activeTab = 'admin'" :class="activeTab === 'admin' ? 'text-orange-500' : 'text-slate-400'" class="flex flex-col items-center flex-1">
+      <span class="text-[10px] font-semibold text-red-500">⚙️ Admin</span>
+    </button>
+  </nav>
+
+  <!-- MODAL LOGIN (Identico al precedente) -->
+  <div x-show="showLoginModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80">
+    <div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-800 p-6 space-y-4">
+      <h3 class="text-lg font-bold">Area Riservata</h3>
+      <input type="email" x-model="email" placeholder="Email" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-sm text-slate-200">
+      <input type="password" x-model="password" placeholder="Password" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-sm text-slate-200">
+      <button @click="isLoggedIn = true; isAdmin = (email === 'admin@epro.com'); showLoginModal = false" class="w-full bg-orange-600 text-white font-bold py-2 rounded">Entra</button>
+    </div>
+  </div>
+
+</body>
+</html>
