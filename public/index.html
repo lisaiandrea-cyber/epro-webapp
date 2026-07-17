@@ -228,9 +228,9 @@
       margin-bottom: 24px;
     }
 
+    /* Badge Casa/Trasferta con colori dedicati */
     .home-tag-badge {
       display: inline-block;
-      background: var(--gradient-primary);
       color: var(--text-white);
       padding: 4px 10px;
       border-radius: 6px;
@@ -238,6 +238,12 @@
       font-weight: 700;
       text-transform: uppercase;
       margin-bottom: 16px;
+    }
+    .home-tag-badge.casa {
+      background-color: var(--accent-blue);
+    }
+    .home-tag-badge.trasferta {
+      background-color: var(--accent-red);
     }
 
     .match-versus-title {
@@ -265,10 +271,11 @@
       gap: 6px;
     }
 
-    .meta-item-red {
-      color: var(--accent-red);
+    .meta-item-accent {
       font-weight: 600;
     }
+    .meta-item-accent.casa { color: var(--accent-blue); }
+    .meta-item-accent.trasferta { color: var(--accent-red); }
 
     .quick-access-grid {
       display: grid;
@@ -362,12 +369,12 @@
       gap: 12px;
     }
 
-    /* Parentesi Visive Laterali */
-    .match-row-card.prossima {
-      border-left: 5px solid var(--accent-red);
-    }
-    .match-row-card.disputata {
+    /* Parentesi Visive Laterali - Casa (Blu) e Trasferta (Rosso) */
+    .match-row-card.casa {
       border-left: 5px solid var(--accent-blue);
+    }
+    .match-row-card.trasferta {
+      border-left: 5px solid var(--accent-red);
     }
 
     .match-row-header {
@@ -404,26 +411,16 @@
       text-transform: uppercase;
     }
 
-    /* Loghi delle Squadre Generati via CSS */
-    .team-logo-badge {
+    /* Immagini reali per i loghi delle squadre */
+    .team-logo-img {
       width: 26px;
       height: 26px;
       border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      font-weight: 800;
-      color: var(--text-white);
+      object-fit: cover;
+      background-color: #1e2c42;
+      display: inline-block;
+      vertical-align: middle;
     }
-    .logo-ap { background: var(--gradient-primary); }
-    .logo-mb { background: #4a5568; }
-    .logo-ct { background: #2b6cb0; }
-    .logo-pm { background: #dd6b20; }
-    .logo-cb { background: #319795; }
-    .logo-db { background: #718096; }
-    .logo-cp { background: #4c51bf; }
-    .logo-generic { background: #4a5568; } /* Fallback generico */
 
     /* Esiti a colori per i Risultati */
     .match-row-result {
@@ -447,7 +444,7 @@
       background-color: rgba(255,255,255,0.05);
     }
 
-    /* Tabella Classifica con Loghi e Maiuscoli */
+    /* Tabella Classifica */
     .classifica-wrapper {
       background-color: var(--bg-card);
       border-radius: 18px;
@@ -483,7 +480,7 @@
     .classifica-table tr:last-child { border-bottom: none; }
 
     .classifica-table tr.highlight-ap {
-      background-color: rgba(229, 62, 62, 0.08);
+      background-color: rgba(43, 108, 176, 0.1); /* Blu evidenziato per Area Pro in classifica */
     }
 
     .rank-number {
@@ -491,7 +488,7 @@
       color: var(--text-muted);
       width: 20px;
     }
-    .highlight-ap .rank-number { color: var(--accent-red); }
+    .highlight-ap .rank-number { color: var(--accent-blue); }
 
     .team-name-cell { 
       font-weight: 700; 
@@ -661,7 +658,7 @@
     <!-- App Header -->
     <header class="app-header">
       <div class="header-logo-section" onclick="switchView('home')">
-        <img src="public/logo.png" class="logo-image" alt="Logo U17 ePRO">
+        <img src="public/logo.png" class="logo-image" alt="Logo U17 ePRO" onerror="this.src='https://placehold.co/80x80/121e33/ffffff?text=U17'">
         <span class="header-title">U17 ePRO</span>
       </div>
       <div class="header-controls">
@@ -735,7 +732,7 @@
       </section>
 
 
-      <!-- VISTA: STAGIONE (STRUTTURA FLUIDA CON SEZIONI ISOLATE) -->
+      <!-- VISTA: STAGIONE -->
       <section id="view-stagione" class="view hidden">
         <div class="season-tabs-nav">
           <div id="pill-calendario" class="season-tab-pill active" onclick="scrollToSlide(0)">Calendario</div>
@@ -745,17 +742,17 @@
 
         <div class="season-horizontal-carousel" id="season-carousel">
           
-          <!-- SLIDE 1: CALENDARIO (Dinamicizzato) -->
+          <!-- SLIDE 1: CALENDARIO -->
           <div class="season-carousel-slide" id="slide-calendario-target">
             <!-- Renderizzato via JS -->
           </div>
 
-          <!-- SLIDE 2: CLASSIFICA (Dinamicizzato) -->
+          <!-- SLIDE 2: CLASSIFICA -->
           <div class="season-carousel-slide" id="slide-classifica-target">
             <!-- Renderizzato via JS -->
           </div>
 
-          <!-- SLIDE 3: STATISTICHE (Dinamicizzato) -->
+          <!-- SLIDE 3: STATISTICHE -->
           <div class="season-carousel-slide" id="slide-statistiche-target">
             <!-- Renderizzato via JS -->
           </div>
@@ -764,7 +761,7 @@
       </section>
 
 
-      <!-- VISTA: SQUADRA (ROSTER & STAFF DINAMICO) -->
+      <!-- VISTA: SQUADRA -->
       <section id="view-squadra" class="view hidden">
         <h2 class="section-title" style="margin-bottom: 16px;">Giocatori (Roster)</h2>
         <div class="roster-list" id="roster-players-target" style="margin-bottom: 24px;">
@@ -787,7 +784,7 @@
       </section>
 
 
-      <!-- VISTA: LOGIN / REGISTRAZIONE -->
+      <!-- VISTA: LOGIN -->
       <section id="view-login" class="view hidden">
         <div class="login-container">
           <div class="login-top-icon">
@@ -831,7 +828,7 @@
       </section>
 
 
-      <!-- VISTA: NUOVO PANNELLO DI CONTROLLO ADMIN -->
+      <!-- VISTA: PANNELLO ADMIN -->
       <section id="view-admin" class="view hidden">
         <h2 class="section-title" style="margin-bottom: 8px; text-transform: uppercase;">🔧 Pannello Admin</h2>
         <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Gestisci, modifica e pubblica tutti i contenuti dell'app in tempo reale.</p>
@@ -853,7 +850,7 @@
 
     </main>
 
-    <!-- Barra di Navigazione Inferiore -->
+    <!-- Barra di Navigazione Inferiore Full-Width -->
     <nav class="bottom-nav-bar">
       <div id="nav-home" class="nav-tab-item active" onclick="switchView('home')">
         <div class="tab-icon-wrapper"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div>
@@ -880,18 +877,18 @@
        DATABASE DI STATO DELL'APP (CON PERSISTENZA LOCALSTORAGE)
        ========================================== */
 
-    // Inizializzazione delle squadre con loghi e punti per la classifica (TUTTO MAIUSCOLO)
+    // Squadre con immagini reali di default (URL segnaposto moderni per il test iniziale)
     let teams = JSON.parse(localStorage.getItem('u17_teams')) || [
-      { id: 'ap', name: 'AREA PRO', logoClass: 'logo-ap', logoText: 'AP', points: 8 },
-      { id: 'db', name: 'DERTHONA BASKET', logoClass: 'logo-db', logoText: 'DB', points: 10 },
-      { id: 'cp', name: 'CAMPUS PIEMONTE', logoClass: 'logo-cp', logoText: 'CP', points: 8 },
-      { id: 'ct', name: 'CUS TORINO', logoClass: 'logo-ct', logoText: 'CT', points: 6 },
-      { id: 'pm', name: 'PALL. MONCALIERI', logoClass: 'logo-pm', logoText: 'PM', points: 4 },
-      { id: 'mb', name: 'METRO BALLERS', logoClass: 'logo-mb', logoText: 'MB', points: 2 },
-      { id: 'cb', name: 'COLLEGNO BASKET', logoClass: 'logo-cb', logoText: 'CB', points: 0 }
+      { id: 'ap', name: 'AREA PRO', logo: 'public/logo.png', points: 8 },
+      { id: 'db', name: 'DERTHONA BASKET', logo: 'https://images.placeholders.dev/?width=60&height=60&text=DB&bgColor=%23121e33&textColor=%23ffffff', points: 10 },
+      { id: 'cp', name: 'CAMPUS PIEMONTE', logo: 'https://images.placeholders.dev/?width=60&height=60&text=CP&bgColor=%23121e33&textColor=%23ffffff', points: 8 },
+      { id: 'ct', name: 'CUS TORINO', logo: 'https://images.placeholders.dev/?width=60&height=60&text=CT&bgColor=%23121e33&textColor=%23ffffff', points: 6 },
+      { id: 'pm', name: 'PALL. MONCALIERI', logo: 'https://images.placeholders.dev/?width=60&height=60&text=PM&bgColor=%23121e33&textColor=%23ffffff', points: 4 },
+      { id: 'mb', name: 'METRO BALLERS', logo: 'https://images.placeholders.dev/?width=60&height=60&text=MB&bgColor=%23121e33&textColor=%23ffffff', points: 2 },
+      { id: 'cb', name: 'COLLEGNO BASKET', logo: 'https://images.placeholders.dev/?width=60&height=60&text=CB&bgColor=%23121e33&textColor=%23ffffff', points: 0 }
     ];
 
-    // Inizializzazione del calendario partite (con il trattino "-" al posto di VS)
+    // Calendario partite
     let matches = JSON.parse(localStorage.getItem('u17_matches')) || [
       { id: 1, giornata: 6, isHome: true, date: '24 OTT', opponentId: 'mb', apScore: null, oppScore: null, isDisputata: false },
       { id: 2, giornata: 7, isHome: false, date: '31 OTT', opponentId: 'ct', apScore: null, oppScore: null, isDisputata: false },
@@ -900,7 +897,7 @@
       { id: 5, giornata: 3, isHome: false, date: '03 OTT', opponentId: 'db', apScore: 69, oppScore: 78, isDisputata: true }
     ];
 
-    // Inizializzazione Roster & Staff Tecnico
+    // Roster & Staff Tecnico
     let roster = JSON.parse(localStorage.getItem('u17_roster')) || [
       { id: 1, number: '#4', name: 'ANDREA LISAI', role: 'PLAYMAKER', isStaff: false },
       { id: 2, number: '#8', name: 'MARCO ROSSI', role: 'GUARDIA', isStaff: false },
@@ -909,19 +906,19 @@
       { id: 5, number: 'Staff', name: 'DUELLI MARCO', role: 'ASSISTENTE ALLENATORE', isStaff: true }
     ];
 
-    // Inizializzazione News & Comunicati
+    // News & Comunicati
     let newsList = JSON.parse(localStorage.getItem('u17_newsList')) || [
       { id: 1, date: '17 LUG 2026', title: "L'U17 ECCELLENZA PUNTA ALLA VETTA", excerpt: "Dopo l'ultimo successo in trasferta, la squadra si prepara ad affrontare l'ostica sfida contro i METRO BALLERS." }
     ];
 
-    // Inizializzazione Statistiche Generali
+    // Statistiche Generali
     let stats = JSON.parse(localStorage.getItem('u17_stats')) || {
       attack: 75.8,
       defense: 70.6,
       fouls: 18.4
     };
 
-    // Funzione di utilità per salvare tutti i dati
+    // Salva i dati in locale
     function saveAllData() {
       localStorage.setItem('u17_teams', JSON.stringify(teams));
       localStorage.setItem('u17_matches', JSON.stringify(matches));
@@ -932,7 +929,7 @@
     }
 
     /* ==========================================
-       GESTIONE DELLE VISTE (NAVIGAZIONE)
+       GESTIONE NAVIGAZIONE
        ========================================== */
     function switchView(viewId) {
       document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
@@ -947,7 +944,7 @@
       window.scrollTo(0, 0);
     }
 
-    // Scroll Orizzontale per la pagina Stagione
+    // Carousel Slider per Sezione Stagione
     const carousel = document.getElementById('season-carousel');
     const pills = ['pill-calendario', 'pill-classifica', 'pill-statistiche'];
 
@@ -977,7 +974,18 @@
     }
 
     /* ==========================================
-       MOTORE DI RENDERING DELLE VISTE (DYNAMIC UI)
+       RENDERING LOGO SQUADRA
+       ========================================== */
+    function getTeamLogoHtml(teamId) {
+      const team = teams.find(t => t.id === teamId);
+      const defaultLogo = "https://images.placeholders.dev/?width=60&height=60&text=%3F&bgColor=%231e2c42&textColor=%23ffffff";
+      const logoUrl = (team && team.logo) ? team.logo : defaultLogo;
+
+      return `<img src="${logoUrl}" class="team-logo-img" alt="Logo ${team ? team.name : ''}" onerror="this.onerror=null; this.src='${defaultLogo}';">`;
+    }
+
+    /* ==========================================
+       MOTORE DI RENDER DELLE INTERFACCE
        ========================================== */
 
     function renderAllViews() {
@@ -988,16 +996,9 @@
       renderAdminPanel();
     }
 
-    // Generazione del logo della squadra
-    function getTeamLogoHtml(teamId) {
-      const team = teams.find(t => t.id === teamId);
-      if (!team) return `<span class="team-logo-badge logo-generic">??</span>`;
-      return `<span class="team-logo-badge ${team.logoClass || 'logo-generic'}">${team.logoText}</span>`;
-    }
-
-    // Renderizza Home
+    // Renderizza la Home
     function renderHomeView() {
-      // Calcolo del Record V-P basato sulle partite giocate
+      // Record V-P
       let wins = 0;
       let losses = 0;
       matches.forEach(m => {
@@ -1008,23 +1009,26 @@
       });
       document.getElementById('home-record-val').textContent = `${wins}-${losses}`;
 
-      // Calcola Posizione in Classifica
+      // Posizione Classifica
       const sortedTeams = [...teams].sort((a,b) => b.points - a.points);
       const apRank = sortedTeams.findIndex(t => t.id === 'ap') + 1;
       document.getElementById('home-rank-val').textContent = `#${apRank}`;
 
-      // Rendering della Prossima Partita
+      // Rendering Prossima Partita
       const nextMatch = matches.find(m => !m.isDisputata);
       const container = document.getElementById('home-next-match-container');
       
       if (nextMatch) {
         const opponent = teams.find(t => t.id === nextMatch.opponentId) || { name: 'AVVERSARIO SCONOSCIUTO' };
+        const homeAwayClass = nextMatch.isHome ? 'casa' : 'trasferta';
+        const homeAwayText = nextMatch.isHome ? 'IN CASA' : 'IN TRASFERTA';
+        
         container.innerHTML = `
           <div class="next-match-card" onclick="switchView('stagione')">
-            <div class="home-tag-badge">${nextMatch.isHome ? 'IN CASA' : 'IN TRASFERTA'}</div>
+            <div class="home-tag-badge ${homeAwayClass}">${homeAwayText}</div>
             <div class="match-versus-title">AREA PRO - ${opponent.name}</div>
             <div class="match-info-meta-row">
-              <div class="meta-item meta-item-red">
+              <div class="meta-item meta-item-accent ${homeAwayClass}">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                 ${nextMatch.isHome ? 'Farm Arena' : 'In Trasferta'}
               </div>
@@ -1044,23 +1048,24 @@
       }
     }
 
-    // Renderizza la Sezione Stagione
+    // Renderizza Calendario, Classifica, Statistiche
     function renderStagioneView() {
-      // 1. Render Calendario
+      // 1. Calendario
       const calTarget = document.getElementById('slide-calendario-target');
       const futureMatches = matches.filter(m => !m.isDisputata);
       const playedMatches = matches.filter(m => m.isDisputata);
 
-      let calHtml = `<h3 class="section-title" style="color: var(--accent-red); margin-bottom: 4px;">Prossime Partite</h3>`;
+      let calHtml = `<h3 class="section-title" style="color: var(--accent-blue); margin-bottom: 4px;">Prossime Partite (Casa Blu • Fuori Rosso)</h3>`;
       calHtml += `<div class="match-list-container">`;
       
       if (futureMatches.length === 0) {
-        calHtml += `<p style="color: var(--text-muted); font-size: 13px;">Nessuna prossima partita schedulata.</p>`;
+        calHtml += `<p style="color: var(--text-muted); font-size: 13px;">Nessuna prossima partita in calendario.</p>`;
       } else {
         futureMatches.forEach(m => {
           const opp = teams.find(t => t.id === m.opponentId) || { name: 'AVVERSARIO' };
+          const homeAwayClass = m.isHome ? 'casa' : 'trasferta';
           calHtml += `
-            <div class="match-row-card prossima">
+            <div class="match-row-card ${homeAwayClass}">
               <div class="match-row-header"><span>GIORNATA ${m.giornata} • ${m.isHome ? 'IN CASA' : 'IN TRASFERTA'}</span><span>${m.date}</span></div>
               <div class="match-row-body">
                 <div class="match-teams-block">
@@ -1076,7 +1081,7 @@
       }
       calHtml += `</div>`;
 
-      calHtml += `<h3 class="section-title" style="color: var(--accent-blue); margin-top: 14px; margin-bottom: 4px;">Partite Disputate</h3>`;
+      calHtml += `<h3 class="section-title" style="color: var(--accent-red); margin-top: 14px; margin-bottom: 4px;">Partite Disputate</h3>`;
       calHtml += `<div class="match-list-container">`;
       if (playedMatches.length === 0) {
         calHtml += `<p style="color: var(--text-muted); font-size: 13px;">Ancora nessuna partita disputata.</p>`;
@@ -1084,8 +1089,9 @@
         playedMatches.forEach(m => {
           const opp = teams.find(t => t.id === m.opponentId) || { name: 'AVVERSARIO' };
           const apWon = m.apScore > m.oppScore;
+          const homeAwayClass = m.isHome ? 'casa' : 'trasferta';
           calHtml += `
-            <div class="match-row-card disputata">
+            <div class="match-row-card ${homeAwayClass}">
               <div class="match-row-header"><span>GIORNATA ${m.giornata} • ${m.isHome ? 'IN CASA' : 'IN TRASFERTA'}</span><span>${m.date}</span></div>
               <div class="match-row-body">
                 <div class="match-teams-block">
@@ -1102,7 +1108,7 @@
       calHtml += `</div>`;
       calTarget.innerHTML = calHtml;
 
-      // 2. Render Classifica (auto-ordinata)
+      // 2. Classifica con immagini dei loghi
       const classTarget = document.getElementById('slide-classifica-target');
       const sortedTeams = [...teams].sort((a,b) => b.points - a.points);
       
@@ -1133,7 +1139,7 @@
       classHtml += `</tbody></table></div>`;
       classTarget.innerHTML = classHtml;
 
-      // 3. Render Statistiche
+      // 3. Statistiche
       const statsTarget = document.getElementById('slide-statistiche-target');
       statsTarget.innerHTML = `
         <h3 class="section-title" style="margin-bottom: 4px;">Statistiche</h3>
@@ -1155,7 +1161,7 @@
       `;
     }
 
-    // Renderizza la Sezione Squadra (Roster & Staff)
+    // Renderizza Squadra (Roster & Staff)
     function renderSquadraView() {
       const playersTarget = document.getElementById('roster-players-target');
       const staffTarget = document.getElementById('roster-staff-target');
@@ -1208,7 +1214,7 @@
 
 
     /* ==========================================
-       PANNELLO DI AMMINISTRAZIONE (FUNZIONALITÀ CRUD)
+       PANNELLO DI CONTROLLO ADMIN (CRUD)
        ========================================== */
 
     function renderAdminPanel() {
@@ -1257,7 +1263,7 @@
                   </select>
                 </div>
                 <div class="admin-input-row" style="align-items: center; gap: 15px;">
-                  <label style="font-size: 11px;"><input type="checkbox" ${m.isHome ? 'checked' : ''} onchange="updateMatch(${m.id}, 'isHome', this.checked)" /> In Casa</label>
+                  <label style="font-size: 11px;"><input type="checkbox" ${m.isHome ? 'checked' : ''} onchange="updateMatch(${m.id}, 'isHome', this.checked)" /> In Casa (Blu)</label>
                   <label style="font-size: 11px;"><input type="checkbox" ${m.isDisputata ? 'checked' : ''} onchange="toggleMatchDisputata(${m.id}, this.checked)" /> Disputata</label>
                 </div>
                 <div class="admin-input-row ${m.isDisputata ? '' : 'hidden'}" id="adm-row-scores-${m.id}">
@@ -1281,22 +1287,21 @@
               <input type="number" id="adm-team-points" class="admin-input" placeholder="Punti Iniziali" required />
             </div>
             <div class="admin-input-row">
-              <input type="text" id="adm-team-logo" class="admin-input" placeholder="Sigla Logo (Max 2 Lettere, Es. CB)" maxlength="2" required />
+              <input type="text" id="adm-team-logo" class="admin-input" placeholder="URL Immagine Logo (es. https://logo.com/it.png)" required />
             </div>
             <button type="submit" class="admin-btn admin-btn-save">Salva Nuova Squadra</button>
           </form>
 
-          <h4 style="margin: 24px 0 10px 0; font-size: 13px; text-transform: uppercase; color: var(--text-muted);">SQUADRE & PUNTI CLASSIFICA</h4>
+          <h4 style="margin: 24px 0 10px 0; font-size: 13px; text-transform: uppercase; color: var(--text-muted);">Squadre & Punti Classifica</h4>
           ${teams.map(t => `
             <div class="admin-form-group">
               <div class="admin-input-row">
                 <input type="text" value="${t.name}" onchange="updateTeam('${t.id}', 'name', this.value.toUpperCase())" class="admin-input" style="font-weight:700;" />
                 <input type="number" value="${t.points}" onchange="updateTeam('${t.id}', 'points', parseInt(this.value) || 0)" class="admin-input" style="max-width: 80px;" placeholder="Punti" />
               </div>
-              <div class="admin-input-row" style="align-items: center; justify-content: space-between;">
-                <span style="font-size: 11px; color: var(--text-muted);">Sigla Logo: <strong>${t.logoText}</strong></span>
-                <input type="text" value="${t.logoText}" onchange="updateTeam('${t.id}', 'logoText', this.value.toUpperCase())" class="admin-input" style="max-width: 60px; text-align: center;" maxlength="2" />
-                ${t.id !== 'ap' ? `<button onclick="deleteTeam('${t.id}')" class="admin-btn admin-btn-delete">Elimina</button>` : `<span style="font-size: 11px; color: var(--accent-green); font-weight:800;">Squadra Principale</span>`}
+              <div class="admin-input-row" style="align-items: center; justify-content: space-between; gap: 10px;">
+                <input type="text" value="${t.logo}" onchange="updateTeam('${t.id}', 'logo', this.value)" class="admin-input" placeholder="URL del logo" />
+                ${t.id !== 'ap' ? `<button onclick="deleteTeam('${t.id}')" class="admin-btn admin-btn-delete">Elimina</button>` : `<span style="font-size: 11px; color: var(--accent-green); font-weight:800; white-space: nowrap;">Squadra Principale</span>`}
               </div>
             </div>
           `).join('')}
@@ -1335,7 +1340,7 @@
                 </select>
               </div>
               <div style="display: flex; justify-content: flex-end;">
-                <button onclick="deleteRoster(${r.id})" class="admin-btn admin-btn-delete">Licenzia / Elimina</button>
+                <button onclick="deleteRoster(${r.id})" class="admin-btn admin-btn-delete">Elimina</button>
               </div>
             </div>
           `).join('')}
@@ -1391,7 +1396,7 @@
       targetArea.innerHTML = html;
     }
 
-    // Toggle visibilità campi score nel pannello admin
+    // Toggle visibilità campi punteggio
     function toggleAdminScoreInputs(checkbox) {
       const target = document.getElementById('adm-scores-container');
       if (checkbox.checked) target.classList.remove('hidden');
@@ -1409,7 +1414,7 @@
       }
     }
 
-    /* Azioni sui Dati */
+    /* CRUD - Azioni e Salvataggi */
     function adminAddMatch(e) {
       e.preventDefault();
       const giornata = parseInt(document.getElementById('adm-giornata').value);
@@ -1438,7 +1443,7 @@
 
       matches.push(newMatch);
       saveAllData();
-      alert('Match inserito correttamente!');
+      alert('Partita aggiunta correttamente!');
     }
 
     function updateMatch(id, field, value) {
@@ -1450,7 +1455,7 @@
     }
 
     function deleteMatch(id) {
-      if (confirm("Eliminare questa partita?")) {
+      if (confirm("Eliminare questa partita dal calendario?")) {
         matches = matches.filter(m => m.id !== id);
         saveAllData();
       }
@@ -1460,20 +1465,19 @@
       e.preventDefault();
       const name = document.getElementById('adm-team-name').value.toUpperCase();
       const points = parseInt(document.getElementById('adm-team-points').value) || 0;
-      const logoText = document.getElementById('adm-team-logo').value.toUpperCase();
+      const logo = document.getElementById('adm-team-logo').value;
       const id = name.toLowerCase().replace(/\s+/g, '-').slice(0, 10);
 
       const newTeam = {
         id,
         name,
-        logoClass: 'logo-generic',
-        logoText,
+        logo,
         points
       };
 
       teams.push(newTeam);
       saveAllData();
-      alert('Squadra registrata con successo!');
+      alert('Squadra aggiunta con successo!');
     }
 
     function updateTeam(id, field, value) {
@@ -1485,7 +1489,7 @@
     }
 
     function deleteTeam(id) {
-      if (confirm("Rimuovere questa squadra? Verrà eliminata anche dalla classifica.")) {
+      if (confirm("Rimuovere questa squadra? Verrà eliminata anche dalla classifica generale.")) {
         teams = teams.filter(t => t.id !== id);
         saveAllData();
       }
@@ -1508,7 +1512,7 @@
 
       roster.push(newMember);
       saveAllData();
-      alert('Membro salvato nel sistema!');
+      alert('Membro inserito correttamente!');
     }
 
     function updateRoster(id, field, value) {
@@ -1520,7 +1524,7 @@
     }
 
     function deleteRoster(id) {
-      if (confirm("Rimuovere questo membro?")) {
+      if (confirm("Eliminare questa persona dalla squadra?")) {
         roster = roster.filter(r => r.id !== id);
         saveAllData();
       }
@@ -1541,7 +1545,7 @@
 
       newsList.unshift(newNews);
       saveAllData();
-      alert('News pubblicata!');
+      alert('Comunicato pubblicato!');
     }
 
     function updateNews(id, field, value) {
@@ -1553,7 +1557,7 @@
     }
 
     function deleteNews(id) {
-      if (confirm("Rimuovere definitivamente questa notizia?")) {
+      if (confirm("Rimuovere definitivamente questo articolo?")) {
         newsList = newsList.filter(n => n.id !== id);
         saveAllData();
       }
@@ -1566,7 +1570,7 @@
 
 
     /* ==========================================
-       SISTEMA CONDIZIONALE DI REGISTRAZIONE / ACCESSO
+       GESTIONE AUTENTICAZIONE UTENTI
        ========================================== */
 
     function toggleAuthMode(isRegister) {
@@ -1602,7 +1606,7 @@
     function handleLoginSuccess(event) {
       event.preventDefault();
       const emailVal = document.getElementById('login-email').value;
-      applyUserProfile(emailVal, false); // false = Bentornato
+      applyUserProfile(emailVal, false);
       alert('Accesso effettuato con successo!');
       switchView('home');
     }
@@ -1610,7 +1614,7 @@
     function handleRegistration(event) {
       event.preventDefault();
       const emailVal = document.getElementById('register-email').value;
-      applyUserProfile(emailVal, true); // true = Benvenuto
+      applyUserProfile(emailVal, true);
       alert('Registrazione completata!');
       toggleAuthMode(false);
       switchView('home');
@@ -1622,7 +1626,7 @@
       switchView('home');
     }
 
-    // Caricamento e rendering iniziale all'avvio dell'App
+    // Rendering iniziale all'avvio
     window.onload = function() {
       renderAllViews();
     };
