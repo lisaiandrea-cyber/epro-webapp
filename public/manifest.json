@@ -1,29 +1,20 @@
 {
-  "short_name": "U17 ECC",
-  "name": "U17 ECC AP Basketball",
+  "name": "U17 ePRO",
+  "short_name": "U17 ePRO",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#121212",
   "icons": [
     {
       "src": "/logo.png",
-      "type": "image/png",
       "sizes": "192x192",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
       "src": "/logo.png",
-      "type": "image/png",
       "sizes": "512x512",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo.png",
-      "type": "image/png",
-      "sizes": "192x192",
-      "purpose": "maskable"
+      "type": "image/png"
     }
-  ],
-  "start_url": "/",
-  "background_color": "#091F3E",
-  "theme_color": "#E30613",
-  "display": "standalone",
-  "orientation": "portrait"
+  ]
 }
