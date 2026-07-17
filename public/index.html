@@ -3,544 +3,1203 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>U17 ePRO</title>
+  <title>U17 ECC AP</title>
 
-  <!-- Collegamento al Manifest per PWA / Icona Mobile -->
-  <link rel="manifest" href="/manifest.json" />
+  <!-- Google Fonts per un look Premium e Moderno -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Favicon per le schede del browser -->
-  <link rel="icon" type="image/png" sizes="32x32" href="/logo.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/logo.png" />
-
-  <!-- Icona specifica per dispositivi Apple (iOS) -->
-  <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
-
-  <!-- Colore della barra di sistema dei telefoni -->
-  <meta name="theme-color" content="#091F3E" />
+  <meta name="theme-color" content="#0a111e" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <style>
-    /* Reset e Variabili globali */
+    /* Reset & Variabili di design basate sulle immagini */
+    :root {
+      --bg-dark: #0a111e;
+      --bg-card: #121e33;
+      --bg-input: #0c1424;
+      --border-color: #1e2c42;
+      --accent-red: #e53e3e;
+      --accent-orange: #ff8c42;
+      --gradient-primary: linear-gradient(135deg, #ff5e36, #e52d27);
+      --text-white: #ffffff;
+      --text-muted: #8fa0ba;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     body {
-      background-color: #f4f6f9;
-      color: #333333;
+      background-color: var(--bg-dark);
+      color: var(--text-white);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      padding-bottom: 70px; /* Spazio per la bottom bar */
+      padding-bottom: 90px;
+      overflow-x: hidden;
     }
 
-    /* Header Swiss Basketball */
-    .swiss-header {
-      background-color: #091F3E;
-      height: 70px;
-      border-bottom: 4px solid #E30613;
-      padding: 0 24px;
+    /* Container centrale stile app mobile per desktop, fluido su mobile */
+    .app-viewport {
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Global Header */
+    .app-header {
+      padding: 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
+      border-bottom: 1px solid var(--border-color);
     }
 
-    .logo-container {
-      position: relative;
-      height: 100%;
+    .header-logo-section {
       display: flex;
       align-items: center;
-      cursor: pointer;
+      gap: 10px;
     }
 
-    .logo-img {
-      height: 95px;
-      width: auto;
-      position: absolute;
-      top: 8px;
-      left: 0;
-      filter: drop-shadow(0px 4px 10px rgba(0, 0, 0, 0.4));
-      z-index: 100;
-    }
-
-    .header-content {
-      margin-left: 110px;
+    .logo-badge-round {
+      width: 40px;
+      height: 40px;
+      background: radial-gradient(circle, #e52d27, #121e33);
+      border-radius: 50%;
       display: flex;
       align-items: center;
-      gap: 8px;
-    }
-
-    .brand-title {
-      color: #ffffff;
+      justify-content: center;
       font-weight: 800;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      font-size: 1.1rem;
+      font-size: 8px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.2);
     }
 
-    .brand-separator {
-      color: #E30613;
-      font-weight: 900;
+    .header-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
 
-    .brand-subtitle {
-      color: #a0aec0;
-      font-weight: 500;
-      font-size: 0.9rem;
-      letter-spacing: 1px;
-    }
-
-    .header-login-btn {
-      background-color: transparent;
-      border: 1px solid #ffffff;
-      color: #ffffff;
-      padding: 6px 14px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: bold;
+    .hamburger-icon {
       cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: all 0.2s;
     }
 
-    .header-login-btn:hover {
-      background-color: #ffffff;
-      color: #091F3E;
-    }
-
-    /* Contenitore Principale delle Viste */
-    .app-container {
-      padding: 40px 16px 24px 16px;
-      max-width: 800px;
-      width: 100%;
-      margin: 0 auto;
-      flex: 1;
-    }
-
-    /* Gestione Visibilità Pagine */
+    /* Viste */
     .view {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      animation: fadeIn 0.3s ease;
     }
+
     .hidden {
       display: none !important;
     }
 
-    /* Card di Contenuto */
-    .content-card {
-      background: #ffffff;
-      border-radius: 8px;
-      padding: 24px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      border-top: 4px solid #091F3E;
-      margin-bottom: 20px;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .content-card h2 {
-      color: #091F3E;
-      font-size: 1.5rem;
-      margin-bottom: 16px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* Sotto-Tab Sezione Stagione */
-    .sub-tabs {
+    /* --- VISTA LOGIN/REGISTRAZIONE --- */
+    .login-container {
       display: flex;
-      background-color: #e2e8f0;
-      border-radius: 6px;
-      padding: 4px;
-      margin-bottom: 20px;
-      gap: 4px;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 30px;
     }
 
-    .sub-tab-btn {
-      flex: 1;
-      background: none;
-      border: none;
-      padding: 10px 8px;
-      font-size: 13px;
-      font-weight: bold;
-      color: #4a5568;
-      cursor: pointer;
-      border-radius: 4px;
-      text-transform: uppercase;
-      transition: all 0.2s;
+    .login-top-icon {
+      background-color: var(--accent-red);
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 20px rgba(229, 62, 62, 0.3);
     }
 
-    .sub-tab-btn.active {
-      background-color: #091F3E;
-      color: #ffffff;
+    .login-title {
+      font-size: 24px;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.2;
+      margin-bottom: 8px;
     }
 
-    /* Form di Login e Registrazione */
-    .auth-container {
-      max-width: 400px;
-      margin: 40px auto;
+    .login-subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-bottom: 30px;
     }
 
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 12px;
-      font-weight: bold;
-      margin-bottom: 6px;
-      color: #4a5568;
-      text-transform: uppercase;
-    }
-
-    .form-group input {
+    .login-card {
+      background-color: rgba(18, 30, 51, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
       width: 100%;
-      padding: 12px;
-      border: 1px solid #cbd5e0;
-      border-radius: 6px;
+      padding: 24px;
+    }
+
+    /* Pulsante Google */
+    .google-btn-dark {
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-white);
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      margin-bottom: 24px;
+      transition: background-color 0.2s;
+    }
+
+    .google-btn-dark:hover {
+      background-color: rgba(255,255,255,0.05);
+    }
+
+    /* Divisore */
+    .or-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+    }
+
+    .or-divider::before, .or-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .or-divider:not(:empty)::before { margin-right: .75em; }
+    .or-divider:not(:empty)::after { margin-left: .75em; }
+
+    /* Campi Input */
+    .input-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .input-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-white);
+    }
+
+    .forgot-pass-link {
+      color: var(--accent-red);
+      font-size: 12px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .input-wrapper {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    .custom-input {
+      width: 100%;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px 14px 14px 44px;
+      color: var(--text-white);
       font-size: 14px;
-    }
-
-    .form-group input:focus {
       outline: none;
-      border-color: #091F3E;
+      transition: border-color 0.2s;
     }
 
-    /* Checkbox per le notifiche push */
-    .checkbox-group {
+    .custom-input:focus {
+      border-color: var(--accent-red);
+    }
+
+    /* Bottone Submit */
+    .submit-btn-red {
+      background-color: var(--accent-red);
+      color: var(--text-white);
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(229, 62, 62, 0.2);
+      transition: background-color 0.2s;
+    }
+
+    .submit-btn-red:hover {
+      background-color: #d32f2f;
+    }
+
+    .auth-bottom-switch {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .auth-bottom-switch span {
+      color: var(--accent-red);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Checkbox per notifiche push nello stile dark */
+    .push-notification-opt {
       display: flex;
       align-items: flex-start;
       gap: 10px;
-      margin: 20px 0;
+      margin-bottom: 20px;
       cursor: pointer;
     }
 
-    .checkbox-group input {
+    .push-notification-opt input {
       width: 18px;
       height: 18px;
+      accent-color: var(--accent-red);
       cursor: pointer;
       margin-top: 2px;
     }
 
-    .checkbox-group label {
-      font-size: 13px;
-      color: #4a5568;
+    .push-notification-opt label {
+      font-size: 12px;
+      color: var(--text-muted);
       line-height: 1.4;
       cursor: pointer;
-      font-weight: 500;
     }
 
-    .btn-submit {
-      width: 100%;
-      background-color: #E30613;
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-top: 10px;
+
+    /* --- VISTA HOME (DASHBOARD) --- */
+    .home-user-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
     }
 
-    .btn-submit:hover {
-      background-color: #b8050f;
+    .user-profile-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .google-btn {
-      width: 100%;
-      background-color: #ffffff;
-      color: #333333;
-      border: 1px solid #cbd5e0;
-      padding: 12px;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
+    .user-avatar-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e2c42, #121e33);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    .google-btn:hover {
-      background-color: #f7fafc;
-    }
-
-    .auth-toggle {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 14px;
-      color: #4a5568;
-    }
-
-    .auth-toggle span {
-      color: #E30613;
-      cursor: pointer;
+      border: 2px solid var(--border-color);
       font-weight: bold;
+      color: var(--text-white);
     }
 
-    /* Bottom Navigation Bar */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 65px;
-      background-color: #091F3E;
-      border-top: 3px solid #E30613;
+    .user-meta-text {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .user-name-text {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .big-welcome-title {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 24px;
+    }
+
+    .big-welcome-title span {
+      display: block;
+      color: var(--accent-orange);
+    }
+
+    /* Grid record e posizione */
+    .stats-row-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .mini-stats-card {
+      background-color: var(--bg-card);
+      border-radius: 18px;
+      padding: 16px;
+      position: relative;
+    }
+
+    .mini-stats-header {
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
       align-items: center;
-      z-index: 1000;
-      box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 12px;
     }
 
-    .nav-item {
+    .mini-stats-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .mini-stats-icon-bg {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mini-stats-value {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .mini-stats-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Prossima partita */
+    .section-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .section-link-orange {
+      color: var(--accent-orange);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .next-match-card {
+      background-color: var(--bg-card);
+      border-radius: 20px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .home-tag-badge {
+      display: inline-block;
+      background-color: rgba(255, 140, 66, 0.15);
+      color: var(--accent-orange);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .match-versus-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .match-info-meta-row {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      position: relative;
+      z-index: 2;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meta-item-orange {
+      color: var(--accent-orange);
+      font-weight: 600;
+    }
+
+    /* Watermark pallone basket in background */
+    .basketball-watermark {
+      position: absolute;
+      right: -20px;
+      bottom: -20px;
+      width: 140px;
+      height: 140px;
+      opacity: 0.1;
+      color: var(--text-white);
+      pointer-events: none;
+    }
+
+    /* Accesso rapido */
+    .quick-access-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .quick-btn-card {
+      background-color: var(--bg-card);
+      border-radius: 16px;
+      padding: 16px 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: #a0aec0;
-      text-decoration: none;
+      gap: 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .quick-btn-card:active {
+      transform: scale(0.95);
+    }
+
+    .quick-btn-icon {
+      color: var(--accent-orange);
+    }
+
+    .quick-btn-label {
       font-size: 11px;
-      font-weight: bold;
+      font-weight: 700;
+    }
+
+
+    /* --- VISTA STAGIONE --- */
+    .season-hero-card {
+      background: radial-gradient(circle at top right, rgba(229, 62, 62, 0.15), var(--bg-card));
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .season-hero-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .season-hero-subtitle {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-red);
       text-transform: uppercase;
       letter-spacing: 0.5px;
+    }
+
+    .season-hero-champ {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .season-hero-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+
+    .season-hero-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .season-hero-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .hero-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       cursor: pointer;
-      width: 25%;
+      border: none;
+    }
+
+    .hero-btn-red {
+      background-color: var(--accent-red);
+      color: var(--text-white);
+    }
+
+    .hero-btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-white);
+    }
+
+    /* Griglia Statistiche 2x2 */
+    .stats-2x2-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .stats-grid-card {
+      background-color: var(--bg-card);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 130px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .stats-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stats-card-icon {
+      color: var(--accent-red);
+    }
+
+    .stats-card-chevron {
+      color: var(--text-muted);
+    }
+
+    .stats-card-body {
+      margin-top: 16px;
+    }
+
+    .stats-card-number {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stats-card-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+
+    /* --- VISTA ROSTER (SQUADRA) --- */
+    .roster-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .player-card {
+      background-color: var(--bg-card);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .player-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .player-number {
+      background-color: rgba(229, 62, 62, 0.15);
+      color: var(--accent-red);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .player-name {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .player-role {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+
+    /* --- VISTA NEWS --- */
+    .news-card {
+      background-color: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .news-content {
+      padding: 16px;
+    }
+
+    .news-date {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-orange);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .news-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .news-excerpt {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+
+    /* --- NAVIGATION BOTTOM BAR --- */
+    .bottom-nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      height: 75px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    /* Forza il posizionamento all'interno della viewport se simulata */
+    @media (min-width: 480px) {
+      .bottom-nav-bar {
+        max-width: 480px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-left: 1px solid var(--border-color);
+        border-right: 1px solid var(--border-color);
+      }
+    }
+
+    .nav-tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      flex: 1;
       height: 100%;
       gap: 4px;
       transition: color 0.2s;
     }
 
-    .nav-item svg {
-      width: 22px;
-      height: 22px;
+    .nav-tab-item svg {
+      width: 20px;
+      height: 20px;
       fill: currentColor;
     }
 
-    .nav-item.active {
-      color: #ffffff;
-      border-top: 3px solid #ffffff;
-      margin-top: -3px;
+    /* Tab Attiva con Gradiente Esatto (Pillola come Immagine 2) */
+    .nav-tab-item.active {
+      color: var(--text-white);
     }
 
-    /* Tabelle Dati */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
+    .nav-tab-item.active .tab-icon-wrapper {
+      background: var(--gradient-primary);
+      width: 52px;
+      height: 40px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(229, 45, 39, 0.3);
     }
 
-    th, td {
-      padding: 10px;
-      text-align: left;
-      border-bottom: 1px solid #e2e8f0;
-      font-size: 14px;
-    }
-
-    th {
-      background-color: #f7fafc;
-      color: #4a5568;
-      font-weight: bold;
+    .nav-tab-item.active svg {
+      fill: var(--text-white);
     }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="swiss-header">
-    <div class="logo-container" onclick="switchView('home')">
-      <img class="logo-img" src="/logo.png" alt="U17 ePRO Logo" />
-    </div>
-    <div class="header-content">
-      <span class="brand-title">U17 ePRO</span>
-      <span class="brand-separator">•</span>
-      <span class="brand-subtitle">SWISS BASKET</span>
-    </div>
-    <div>
-      <button id="login-header-btn" class="header-login-btn" onclick="switchView('login')">Login</button>
-    </div>
-  </header>
+  <div class="app-viewport">
 
-  <!-- Area Principale Contenuti (Sola Lettura / Consultazione) -->
-  <main class="app-container">
-
-    <!-- VISTA: HOME -->
-    <section id="view-home" class="view">
-      <div class="content-card">
-        <h2>Benvenuto in U17 ePRO</h2>
-        <p>Questa è l'applicazione ufficiale di consultazione per la squadra <strong>U17 ePRO</strong>. Puoi utilizzare il menu in basso per scorrere liberamente i calendari, la classifica aggiornata, le statistiche e le ultime news.</p>
-      </div>
-    </section>
-
-    <!-- VISTA: STAGIONE -->
-    <section id="view-stagione" class="view hidden">
-      <div class="sub-tabs">
-        <button id="tab-btn-calendario" class="sub-tab-btn active" onclick="switchStagioneTab('calendario')">Calendario</button>
-        <button id="tab-btn-classifica" class="sub-tab-btn" onclick="switchStagioneTab('classifica')">Classifica</button>
-        <button id="tab-btn-statistiche" class="sub-tab-btn" onclick="switchStagioneTab('statistiche')">Statistiche</button>
-      </div>
-
-      <!-- Sotto-Sezione: Calendario -->
-      <div id="sub-view-calendario">
-        <div class="content-card">
-          <h2>Prossime Partite</h2>
-          <table>
-            <tr><th>Data</th><th>Avversario</th><th>Ora</th></tr>
-            <tr><td>24 Ott</td><td>Riva Basket</td><td>16:00</td></tr>
-            <tr><td>31 Ott</td><td>SAM Massagno</td><td>14:30</td></tr>
-          </table>
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="header-logo-section" onclick="switchView('home')">
+        <div class="logo-badge-round">
+          U17<br>ECC
         </div>
+        <span class="header-title">U17 ECC AP</span>
       </div>
+      <div class="hamburger-icon" onclick="switchView('login')">
+        <!-- Icona profilo utente generica -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </div>
+    </header>
 
-      <!-- Sotto-Sezione: Classifica -->
-      <div id="sub-view-classifica" class="hidden">
-        <div class="content-card">
-          <h2>Classifica Campionato</h2>
-          <table>
-            <tr><th>Pos</th><th>Squadra</th><th>Punti</th></tr>
-            <tr><td>1</td><td><strong>U17 ePRO</strong></td><td>12</td></tr>
-            <tr><td>2</td><td>Lugano Tigers</td><td>10</td></tr>
-            <tr><td>3</td><td>SAM Massagno</td><td>8</td></tr>
-          </table>
-        </div>
-      </div>
+    <!-- MAIN APP WRAPPER -->
+    <main style="flex: 1;">
 
-      <!-- Sotto-Sezione: Statistiche -->
-      <div id="sub-view-statistiche" class="hidden">
-        <div class="content-card">
-          <h2>Statistiche di Squadra</h2>
-          <p style="margin-bottom: 8px;">Media Punti Segnati: <strong>78.4</strong></p>
-          <p style="margin-bottom: 8px;">Media Punti Subiti: <strong>64.2</strong></p>
-          <p>Falli di Squadra (Media): <strong>14.5</strong></p>
-        </div>
-      </div>
-    </section>
-
-    <!-- VISTA: ROSTER & STAFF -->
-    <section id="view-roster" class="view hidden">
-      <div class="content-card">
-        <h2>Il Roster</h2>
-        <table>
-          <tr><th>Numero</th><th>Giocatore</th><th>Ruolo</th></tr>
-          <tr><td>#4</td><td>M. Rossi</td><td>Playmaker</td></tr>
-          <tr><td>#8</td><td>L. Bianchi</td><td>Guardia</td></tr>
-          <tr><td>#15</td><td>G. Verdi</td><td>Centro</td></tr>
-        </table>
-      </div>
-      <div class="content-card">
-        <h2>Staff Tecnico</h2>
-        <p style="margin-bottom: 8px;">Capo Allenatore: <strong>Coach Head</strong></p>
-        <p>Vice Allenatore: <strong>Coach Assistant</strong></p>
-      </div>
-    </section>
-
-    <!-- VISTA: NEWS -->
-    <section id="view-news" class="view hidden">
-      <div class="content-card">
-        <h2>Ultimi Aggiornamenti</h2>
-        <h3 style="margin: 10px 0 5px 0; color: #E30613;">Nuovo Brand: Nasce U17 ePRO</h3>
-        <p>L'applicazione e il team aggiornano la propria identità visiva ed evolvono verso il nuovo ecosistema digitale ePRO.</p>
-      </div>
-    </section>
-
-    <!-- VISTA: LOGIN / REGISTRAZIONE UTENTE -->
-    <section id="view-login" class="view hidden">
-      <div class="content-card auth-container">
-        <!-- Form Accedi standard -->
-        <div id="auth-login-box">
-          <h2>Accedi al Profilo</h2>
-          <form onsubmit="handleLoginSuccess(event)">
-            <div class="form-group">
-              <label>Indirizzo Email</label>
-              <input type="email" placeholder="Inserisci la tua email" required />
+      <!-- VISTA: HOME (DASHBOARD) -->
+      <section id="view-home" class="view">
+        <div class="home-user-bar">
+          <div class="user-profile-info">
+            <div id="user-avatar" class="user-avatar-circle">OS</div>
+            <div>
+              <div class="user-meta-text">Bentornato,</div>
+              <div id="user-fullname" class="user-name-text">Ospite</div>
             </div>
-            <div class="form-group">
-              <label>Password</label>
-              <input type="password" placeholder="••••••••" required />
-            </div>
-            <button type="submit" class="btn-submit">Accedi</button>
-          </form>
-          <button class="google-btn" onclick="handleGoogleSuccess('Accesso')">
-            <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            Accedi con Google
-          </button>
-          <div class="auth-toggle">Non hai un account? <span onclick="toggleAuthMode(true)">Registrati</span></div>
+          </div>
+          <div class="user-avatar-circle" style="width: 36px; height: 36px; font-size: 11px; cursor: pointer;" onclick="switchView('login')">
+            Accedi
+          </div>
         </div>
 
-        <!-- Form Registrati standard -->
-        <div id="auth-register-box" class="hidden">
-          <h2>Registrati</h2>
-          <form onsubmit="handleRegistration(event)">
-            <div class="form-group">
-              <label>Indirizzo Email</label>
-              <input type="email" placeholder="esempio@email.com" required />
-            </div>
-            <div class="form-group">
-              <label>Password</label>
-              <input type="password" placeholder="Crea una password" required />
-            </div>
-            
-            <!-- Notifiche Push Mobili/Desktop -->
-            <div class="checkbox-group">
-              <input type="checkbox" id="allow-push-notifications" checked />
-              <label for="allow-push-notifications">
-                Attiva le notifiche push sul tuo smartphone o PC per ricevere i risultati in tempo reale e gli aggiornamenti di U17 ePRO.
-              </label>
-            </div>
+        <h1 class="big-welcome-title">Benvenuti su<br><span>U17 Area Pro</span></h1>
 
-            <button type="submit" class="btn-submit">Crea Account</button>
-          </form>
-          <button class="google-btn" onclick="handleGoogleSuccess('Registrazione')">
-            <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            Registrati con Google
-          </button>
-          <div class="auth-toggle">Hai già un account? <span onclick="toggleAuthMode(false)">Accedi</span></div>
+        <!-- Record e Posizione Grid -->
+        <div class="stats-row-grid">
+          <div class="mini-stats-card">
+            <div class="mini-stats-header">
+              <span class="mini-stats-title">Record stagione</span>
+              <div class="mini-stats-icon-bg" style="background-color: rgba(255, 140, 66, 0.15);">
+                <svg width="14" height="14" fill="#ff8c42" viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.67 4.39 4.94C8.25 14.28 10.5 16 13 16v3h-3v2h8v-2h-3v-3c2.5 0 4.75-1.72 5.61-4.06C22.08 11.67 24 9.55 24 7V6c0-1.1-.9-2-2-2zM5 7h2v3H5V7zm14 3h-2V7h2v3z"/></svg>
+              </div>
+            </div>
+            <div class="mini-stats-value">2-1</div>
+            <div class="mini-stats-subtitle">V-P</div>
+          </div>
+
+          <div class="mini-stats-card">
+            <div class="mini-stats-header">
+              <span class="mini-stats-title">Posizione</span>
+              <div class="mini-stats-icon-bg" style="background-color: rgba(66, 153, 225, 0.15);">
+                <svg width="14" height="14" fill="#4299e1" viewBox="0 0 24 24"><path d="M10 20h4V4h-4v16zm-6 0h4v-8H4v8zM16 9v11h4V9h-4z"/></svg>
+              </div>
+            </div>
+            <div class="mini-stats-value">#2</div>
+            <div class="mini-stats-subtitle">in classifica</div>
+          </div>
         </div>
+
+        <!-- Prossima Partita -->
+        <div class="section-header-row">
+          <h2 class="section-title">Prossima partita</h2>
+          <a href="#" class="section-link-orange" onclick="switchView('stagione')">Vedi tutte</a>
+        </div>
+
+        <div class="next-match-card">
+          <div class="home-tag-badge">In Casa</div>
+          <div class="match-versus-title">AREA PRO vs Metro Ballers</div>
+          
+          <div class="match-info-meta-row">
+            <div class="meta-item meta-item-orange">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              Farm Arena
+            </div>
+            <div class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              21/7 • 09:23
+            </div>
+          </div>
+
+          <!-- Filigrana Pallone da Basket -->
+          <svg class="basketball-watermark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M6.2 6.2c2.4 2.4 2.4 6.4 0 8.8M17.8 6.2c-2.4 2.4-2.4 6.4 0 8.8M2 12h20M12 2v20"></path>
+          </svg>
+        </div>
+
+        <!-- Accesso rapido -->
+        <h2 class="section-title" style="margin-bottom: 12px;">Accesso rapido</h2>
+        <div class="quick-access-grid">
+          <div class="quick-btn-card" onclick="switchView('squadra')">
+            <div class="quick-btn-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+            <span class="quick-btn-label">Roster</span>
+          </div>
+          <div class="quick-btn-card" onclick="switchView('stagione')">
+            <div class="quick-btn-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            </div>
+            <span class="quick-btn-label">Classifica</span>
+          </div>
+          <div class="quick-btn-card" onclick="switchView('news')">
+            <div class="quick-btn-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            </div>
+            <span class="quick-btn-label">News</span>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- VISTA: STAGIONE -->
+      <section id="view-stagione" class="view hidden">
+        <div class="season-hero-card">
+          <div class="season-hero-header">
+            <div class="logo-badge-round" style="width: 32px; height: 32px; font-size: 7px;">U17<br>ECC</div>
+            <div>
+              <div class="season-hero-subtitle">STAGIONE 2026/2027</div>
+              <div class="season-hero-champ">Campionato U17 Eccellenza</div>
+            </div>
+          </div>
+          
+          <h1 class="season-hero-title">U17 ECCELLENZA AP</h1>
+          <p class="season-hero-desc">Segui la nostra squadra, i nostri ragazzi; calendario, risultati, classifiche e statistiche in tempo reale.</p>
+          
+          <div class="season-hero-buttons">
+            <button class="hero-btn hero-btn-red" onclick="alert('Apertura Calendario...')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              Calendario
+            </button>
+            <button class="hero-btn hero-btn-outline" onclick="switchView('squadra')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              Roster
+            </button>
+          </div>
+        </div>
+
+        <!-- Griglia Statistiche 2x2 -->
+        <div class="stats-2x2-grid">
+          <div class="stats-grid-card" onclick="alert('Partite Giocate: 5')">
+            <div class="stats-card-header">
+              <div class="stats-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              </div>
+              <div class="stats-card-chevron">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+            </div>
+            <div class="stats-card-body">
+              <div class="stats-card-number">5</div>
+              <div class="stats-card-label">Partite Giocate</div>
+            </div>
+          </div>
+
+          <div class="stats-grid-card" onclick="alert('Vittorie: 4')">
+            <div class="stats-card-header">
+              <div class="stats-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+              </div>
+              <div class="stats-card-chevron">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+            </div>
+            <div class="stats-card-body">
+              <div class="stats-card-number">4</div>
+              <div class="stats-card-label">Vittorie</div>
+            </div>
+          </div>
+
+          <div class="stats-grid-card" onclick="switchView('squadra')">
+            <div class="stats-card-header">
+              <div class="stats-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+              </div>
+              <div class="stats-card-chevron">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+            </div>
+            <div class="stats-card-body">
+              <div class="stats-card-number">10</div>
+              <div class="stats-card-label">Giocatori</div>
+            </div>
+          </div>
+
+          <div class="stats-grid-card" onclick="alert('Media Punti Squadra: 9 PTS')">
+            <div class="stats-card-header">
+              <div class="stats-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              </div>
+              <div class="stats-card-chevron">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </div>
+            </div>
+            <div class="stats-card-body">
+              <div class="stats-card-number">9 PTS</div>
+              <div class="stats-card-label">Stat. Squadra</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- VISTA: ROSTER / SQUADRA -->
+      <section id="view-squadra" class="view hidden">
+        <h2 class="section-title" style="margin-bottom: 16px;">Il Roster</h2>
+        <div class="roster-list">
+          <div class="player-card">
+            <div class="player-left">
+              <div class="player-number">#4</div>
+              <div>
+                <div class="player-name">Andrea Lisai</div>
+                <div class="player-role">Playmaker</div>
+              </div>
+            </div>
+          </div>
+          <div class="player-card">
+            <div class="player-left">
+              <div class="player-number">#8</div>
+              <div>
+                <div class="player-name">Marco Rossi</div>
+                <div class="player-role">Guardia</div>
+              </div>
+            </div>
+          </div>
+          <div class="player-card">
+            <div class="player-left">
+              <div class="player-number">#15</div>
+              <div>
+                <div class="player-name">Luca Bianchi</div>
+                <div class="player-role">Centro</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- VISTA: NEWS -->
+      <section id="view-news" class="view hidden">
+        <h2 class="section-title" style="margin-bottom: 16px;">Ultime Notizie</h2>
+        
+        <div class="news-card">
+          <div class="news-content">
+            <div class="news-date">17 LUG 2026</div>
+            <h3 class="news-title">U17 Eccellenza AP punta alla vetta</h3>
+            <p class="news-excerpt">Dopo l'ultimo successo in trasferta, la squadra si prepara ad affrontare l'ostica sfida contro i Metro Ballers.</p>
+          </div>
+        </div>
+
+        <div class="news-card">
+          <div class="news-content">
+            <div class="news-date">10 LUG 2026</div>
+            <h3 class="news-title">Notifiche push attive nell'app</h3>
+            <p class="news-excerpt">Da oggi tutti i tifosi e giocatori possono attivare le notifiche istantanee per non perdersi alcun aggiornamento sul match.</p>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- VISTA: LOGIN / REGISTRAZIONE -->
+      <section id="view-login" class="view hidden">
+        <div class="login-container">
+          
+          <!-- Icona rossa con login -->
+          <div class="login-top-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+          </div>
+
+          <!-- Box d'Accesso (Accedi) -->
+          <div id="auth-login-box" style="width:100%;">
+            <h1 class="login-title">Bentornato nell'App dell' U17 Eccellenza AP</h1>
+            <p class="login-subtitle" style="text-align: center;">Accedi al tuo account</p>
+
+            <div class="login-card">
+              <button class="google-btn-dark" onclick="handleGoogleSuccess('Accesso')">
+                <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                Continua con Google
+              </button>
+
+              <div class="or-divider">OPPURE</div>
+
+              <form onsubmit="handleLoginSuccess(event)">
+                <div class="input-label-row">
+                  <span class="input-label">Email</span>
+                </div>
+                <div class="input-wrapper">
+                  <div class="input-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                  </div>
+                  <input type="email" id="login-email" class="custom-input" placeholder="you@example.com" required />
+                </div>
+
+                <div class="input-label-row">
+                  <span class="input-label">Password</span>
+                  <a href="#" class="forgot-pass-link" onclick="alert('Funzione di recupero password in sviluppo!')">Password dimenticata?</a>
+                </div>
+                <div class="input-wrapper">
+                  <div class="input-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  </div>
+                  <input type="password" class="custom-input" placeholder="••••••••" required />
+                </div>
+
+                <button type="submit" class="submit-btn-red">Accedi</button>
+              </form>
+            </div>
+
+            <div class="auth-bottom-switch">Non hai un account? <span onclick="toggleAuthMode(true)">Registrati</span></div>
+          </div>
+
+          <!-- Box Registrazione (Registrati) -->
+          <div id="auth-register-box" class="hidden" style="width:100%;">
+            <h1 class="login-title">Crea un nuovo Profilo</h1>
+            <p class="login-subtitle" style="text-align: center;">Iscriviti a U17 Area Pro</p>
+
+            <div class="login-card">
+              <button class="google-btn-dark" onclick="handleGoogleSuccess('Registrazione')">
+                <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                Registrati con Google
+              </button>
+
+              <div class="or-divider">OPPURE</div>
+
+              <form onsubmit="handleRegistration(event)">
+                <div class="input-label-row">
+                  <span class="input-label">Email</span>
+                </div>
+                <div class="input-wrapper">
+                  <div class="input-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                  </div>
+                  <input type="email" id="register-email" class="custom-input" placeholder="you@example.com" required />
+                </div>
+
+                <div class="input-label-row">
+                  <span class="input-label">Password</span>
+                </div>
+                <div class="input-wrapper">
+                  <div class="input-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  </div>
+                  <input type="password" class="custom-input" placeholder="••••••••" required />
+                </div>
+
+                <!-- Abilitazione Notifiche Push -->
+                <div class="push-notification-opt">
+                  <input type="checkbox" id="allow-push-notifications" checked />
+                  <label for="allow-push-notifications">
+                    Desidero ricevere le notifiche push native di sistema su questo smartphone per risultati, variazioni e notizie in tempo reale.
+                  </label>
+                </div>
+
+                <button type="submit" class="submit-btn-red">Registrati</button>
+              </form>
+            </div>
+
+            <div class="auth-bottom-switch">Hai già un account? <span onclick="toggleAuthMode(false)">Accedi</span></div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Navigation Bottom Bar (Stile Tablet/Mobile App esatto) -->
+    <nav class="bottom-nav-bar">
+      <div id="nav-home" class="nav-tab-item active" onclick="switchView('home')">
+        <div class="tab-icon-wrapper">
+          <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        </div>
+        <span>Home</span>
       </div>
-    </section>
+      <div id="nav-stagione" class="nav-tab-item" onclick="switchView('stagione')">
+        <div class="tab-icon-wrapper">
+          <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+        </div>
+        <span>Stagione</span>
+      </div>
+      <div id="nav-squadra" class="nav-tab-item" onclick="switchView('squadra')">
+        <div class="tab-icon-wrapper">
+          <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        </div>
+        <span>Squadra</span>
+      </div>
+      <div id="nav-news" class="nav-tab-item" onclick="switchView('news')">
+        <div class="tab-icon-wrapper">
+          <svg viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-1 12H5V9h14v8z"/></svg>
+        </div>
+        <span>News</span>
+      </div>
+    </nav>
 
-  </main>
+  </div>
 
-  <!-- Bottom Navigation Bar Mobile-First -->
-  <nav class="bottom-nav">
-    <div id="nav-home" class="nav-item active" onclick="switchView('home')">
-      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      Home
-    </div>
-    <div id="nav-stagione" class="nav-item" onclick="switchView('stagione')">
-      <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
-      Stagione
-    </div>
-    <div id="nav-roster" class="nav-item" onclick="switchView('roster')">
-      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-      Roster
-    </div>
-    <div id="nav-news" class="nav-item" onclick="switchView('news')">
-      <svg viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-1 12H5V9h14v8z"/></svg>
-      News
-    </div>
-  </nav>
-
-  <!-- Logica Applicativa Navigazione e Richiesta Notifiche Push -->
+  <!-- Logica Applicativa Interattiva -->
   <script>
-    // Cambia la vista principale dell'applicazione
+    // Gestione della Navigazione Principale delle Viste
     function switchView(viewId) {
       document.querySelectorAll('.view').forEach(view => {
         view.classList.add('hidden');
       });
 
-      document.querySelectorAll('.nav-item').forEach(item => {
+      document.querySelectorAll('.nav-tab-item').forEach(item => {
         item.classList.remove('active');
       });
 
@@ -553,22 +1212,12 @@
       if (targetNav) {
         targetNav.classList.add('active');
       }
+
+      // Torna in alto quando cambi vista
+      window.scrollTo(0, 0);
     }
 
-    // Cambia i sotto-tab all'interno della sezione Stagione
-    function switchStagioneTab(tabId) {
-      const subViews = ['calendario', 'classifica', 'statistiche'];
-      
-      subViews.forEach(view => {
-        document.getElementById(`sub-view-${view}`).classList.add('hidden');
-        document.getElementById(`tab-btn-${view}`).classList.remove('active');
-      });
-
-      document.getElementById(`sub-view-${tabId}`).classList.remove('hidden');
-      document.getElementById(`tab-btn-${tabId}`).classList.add('active');
-    }
-
-    // Switch tra box di Login e box di Registrazione
+    // Cambia tra Login e Registrazione
     function toggleAuthMode(isRegister) {
       if (isRegister) {
         document.getElementById('auth-login-box').classList.add('hidden');
@@ -579,58 +1228,73 @@
       }
     }
 
-    // Richiesta permessi nativi per notifiche Push (Mobile e PC)
+    // Richiesta permessi nativi Notifiche Push
     function requestPushPermission(callback) {
       if (!('Notification' in window)) {
-        alert('Questo dispositivo non supporta le notifiche push native.');
+        alert('Il dispositivo attuale non supporta le notifiche push native del browser.');
         if (callback) callback();
         return;
       }
 
       Notification.requestPermission().then(permission => {
         if (permission === 'granted') {
-          alert('Notifiche push attivate correttamente sul dispositivo per U17 ePRO!');
+          alert('Notifiche Push attivate con successo su questo dispositivo!');
         } else if (permission === 'denied') {
-          alert('Notifiche disattivate. Puoi abilitarle in qualsiasi momento dalle impostazioni del browser del telefono.');
+          alert('Notifiche non abilitate. Se vuoi riattivarle, sbloccale dal lucchetto della barra degli indirizzi del browser.');
         }
         if (callback) callback();
       });
     }
 
-    // Login Utente standard completato
+    // Simulazione di accesso riuscito (Personalizzazione UI)
+    function applyUserProfile(email) {
+      const displayEmail = email || "andrea.lisai@example.com";
+      const initials = displayEmail.substring(0, 2).toUpperCase();
+      const userName = displayEmail.split('@')[0];
+      
+      // Converte i dettagli in base alle immagini (Esempio: Andrea Lisai)
+      const finalName = userName.toLowerCase() === 'you' || userName.includes('example') ? 'Andrea Lisai' : userName;
+      const finalInitials = finalName === 'Andrea Lisai' ? 'AL' : initials;
+
+      document.getElementById('user-avatar').innerText = finalInitials;
+      document.getElementById('user-fullname').innerText = finalName;
+    }
+
+    // Login Utente
     function handleLoginSuccess(event) {
       event.preventDefault();
-      document.getElementById('login-header-btn').innerText = "Profilo";
-      alert('Accesso effettuato correttamente!');
+      const emailVal = document.getElementById('login-email').value;
+      applyUserProfile(emailVal);
+      alert('Accesso completato!');
       switchView('home');
     }
 
-    // Registrazione Utente standard completata
+    // Registrazione Utente + Attivazione Notifiche
     function handleRegistration(event) {
       event.preventDefault();
+      const emailVal = document.getElementById('register-email').value;
       const pushCheckbox = document.getElementById('allow-push-notifications');
-      
+
       if (pushCheckbox && pushCheckbox.checked) {
         requestPushPermission(() => {
-          document.getElementById('login-header-btn').innerText = "Profilo";
+          applyUserProfile(emailVal);
           alert('Registrazione completata!');
           toggleAuthMode(false);
           switchView('home');
         });
       } else {
-        document.getElementById('login-header-btn').innerText = "Profilo";
-        alert('Registrazione completata! (Notifiche push disattivate)');
+        applyUserProfile(emailVal);
+        alert('Registrazione completata senza notifiche push.');
         toggleAuthMode(false);
         switchView('home');
       }
     }
 
-    // Gestione Google Flow
-    function handleGoogleSuccess(type) {
+    // Login o registrazione Google
+    function handleGoogleSuccess(actionType) {
       requestPushPermission(() => {
-        document.getElementById('login-header-btn').innerText = "Profilo";
-        alert(`${type} tramite account Google completato con successo!`);
-        toggleAuthMode(false);
+        applyUserProfile("Andrea Lisai");
+        alert(`${actionType} tramite account Google completato!`);
         switchView('home');
       });
     }
