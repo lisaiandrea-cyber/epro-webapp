@@ -608,11 +608,15 @@
       box-shadow: 0 8px 20px rgba(229, 62, 62, 0.3);
     }
     .login-title { font-size: 24px; font-weight: 800; text-align: center; margin-bottom: 8px; }
-    .login-subtitle { color: var(--text-muted); font-size: 15px; margin-bottom: 30px; }
+    .login-subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
     .login-card { background-color: rgba(18, 30, 51, 0.5); border: 1px solid var(--border-color); border-radius: 20px; width: 100%; padding: 24px; }
     .google-btn-dark {
       background-color: transparent; border: 1px solid var(--border-color); color: var(--text-white);
-      width: 100%; padding: 14px; border-radius: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; margin-bottom: 24px;
+      width: 100%; padding: 14px; border-radius: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; margin-bottom: 24px;
+    }
+    .google-btn-dark svg {
+      width: 18px;
+      height: 18px;
     }
     .or-divider { display: flex; align-items: center; text-align: center; color: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-bottom: 24px; }
     .or-divider::before, .or-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-color); }
@@ -806,14 +810,26 @@
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
             </div>
             <h1 class="login-title">Bentornato nell'App</h1>
-            <p class="login-subtitle" style="text-align: center;">Accedi al tuo account</p>
+            <p class="login-subtitle" style="text-align: center; line-height: 1.4; padding: 0 8px;">Accedi al tuo account per essere sempre aggiornato e ricevere le news della nostra U17 eccellenza.</p>
             <div class="login-card">
-              <button class="google-btn-dark" onclick="handleGoogleSuccess(false)">Continua con Google</button>
+              <button class="google-btn-dark" onclick="handleGoogleSuccess(false)">
+                <!-- Icona Google SVG multicolore -->
+                <svg viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                Accedi con Google
+              </button>
               <div class="or-divider">OPPURE</div>
               <form onsubmit="handleLoginSuccess(event)">
                 <div class="input-label-row"><span class="input-label">Email</span></div>
                 <div class="input-wrapper"><input type="email" id="login-email" class="custom-input" placeholder="you@example.com" required /></div>
-                <div class="input-label-row"><span class="input-label">Password</span></div>
+                <div class="input-label-row">
+                  <span class="input-label">Password</span>
+                  <span onclick="showForgotBox()" style="font-size: 12px; color: var(--accent-red); font-weight: 600; cursor: pointer;">Password dimenticata?</span>
+                </div>
                 <div class="input-wrapper"><input type="password" id="login-password" class="custom-input" placeholder="••••••••" required /></div>
                 <button type="submit" class="submit-btn-red">Accedi</button>
               </form>
@@ -829,18 +845,46 @@
             <h1 class="login-title">Crea un Profilo</h1>
             <p class="login-subtitle" style="text-align: center;">Iscriviti a U17 Area Pro</p>
             <div class="login-card">
-              <button class="google-btn-dark" onclick="handleGoogleSuccess(true)">Registrati con Google</button>
+              <button class="google-btn-dark" onclick="handleGoogleSuccess(true)">
+                <svg viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                Registrati con Google
+              </button>
               <div class="or-divider">OPPURE</div>
               <form onsubmit="handleRegistration(event)">
                 <div class="input-label-row"><span class="input-label">Email</span></div>
                 <div class="input-wrapper"><input type="email" id="register-email" class="custom-input" placeholder="you@example.com" required /></div>
                 <div class="input-label-row"><span class="input-label">Password</span></div>
-                <div class="input-wrapper"><input type="password" class="custom-input" placeholder="••••••••" required /></div>
+                <div class="input-wrapper"><input type="password" id="register-password" class="custom-input" placeholder="••••••••" required /></div>
                 <button type="submit" class="submit-btn-red">Registrati</button>
               </form>
             </div>
             <div class="auth-bottom-switch">Hai già un account? <span onclick="toggleAuthMode(false)">Accedi</span></div>
           </div>
+
+          <!-- Stato: SCHERMATA PASSWORD DIMENTICATA -->
+          <div id="auth-forgot-box" class="hidden" style="width:100%;">
+            <div class="login-top-icon" style="margin: 0 auto 24px auto; background: var(--accent-blue);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h1 class="login-title">Reimposta Password</h1>
+            <p class="login-subtitle" style="text-align: center; padding: 0 10px;">Inserisci la tua email e la nuova password per aggiornare le tue credenziali.</p>
+            <div class="login-card">
+              <form onsubmit="handlePasswordReset(event)">
+                <div class="input-label-row"><span class="input-label">Email dell'account</span></div>
+                <div class="input-wrapper"><input type="email" id="forgot-email" class="custom-input" placeholder="you@example.com" required /></div>
+                <div class="input-label-row"><span class="input-label">Nuova Password</span></div>
+                <div class="input-wrapper"><input type="password" id="forgot-new-password" class="custom-input" placeholder="••••••••" required /></div>
+                <button type="submit" class="submit-btn-red" style="background: var(--accent-blue); box-shadow: 0 4px 12px rgba(43, 108, 176, 0.2);">Aggiorna Password</button>
+              </form>
+            </div>
+            <div class="auth-bottom-switch">Torna all'<span onclick="toggleAuthMode(false)">Accedi</span></div>
+          </div>
+
         </div>
       </section>
 
@@ -893,6 +937,14 @@
     /* ==========================================
        DATABASE DI STATO DELL'APP (CON PERSISTENZA LOCALSTORAGE)
        ========================================== */
+
+    // Database utenti per autenticazione (previene perdite di sessione)
+    let registeredUsers = JSON.parse(localStorage.getItem('u17_registered_users')) || [];
+    // Assicuriamoci che l'admin sia sempre presente all'avvio
+    if (!registeredUsers.some(u => u.email === 'admin@areapro.it')) {
+      registeredUsers.push({ email: 'admin@areapro.it', password: 'admin123' });
+      localStorage.setItem('u17_registered_users', JSON.stringify(registeredUsers));
+    }
 
     // Squadre con immagini reali di default
     let teams = JSON.parse(localStorage.getItem('u17_teams')) || [
@@ -1601,19 +1653,30 @@
        ========================================== */
 
     function toggleAuthMode(isRegister) {
+      document.getElementById('auth-login-box').classList.add('hidden');
+      document.getElementById('auth-register-box').classList.add('hidden');
+      document.getElementById('auth-logged-box').classList.add('hidden');
+      document.getElementById('auth-forgot-box').classList.add('hidden');
+
       if (isRegister) {
-        document.getElementById('auth-login-box').classList.add('hidden');
         document.getElementById('auth-register-box').classList.remove('hidden');
-        document.getElementById('auth-logged-box').classList.add('hidden');
       } else {
-        document.getElementById('auth-register-box').classList.add('hidden');
         document.getElementById('auth-login-box').classList.remove('hidden');
-        document.getElementById('auth-logged-box').classList.add('hidden');
       }
+    }
+
+    function showForgotBox() {
+      document.getElementById('auth-login-box').classList.add('hidden');
+      document.getElementById('auth-register-box').classList.add('hidden');
+      document.getElementById('auth-logged-box').classList.add('hidden');
+      document.getElementById('auth-forgot-box').classList.remove('hidden');
     }
 
     function applyUserProfile(email, isFirstTimeRegistration) {
       const adminBtn = document.getElementById('header-admin-btn');
+
+      // Nascondiamo sempre tutti i box di autenticazione all'avvio dell'applicazione per sicurezza
+      document.getElementById('auth-forgot-box').classList.add('hidden');
 
       if (!email) {
         // Caso: Nessun Utente (Ospite / Scollegato)
@@ -1667,12 +1730,17 @@
       const emailVal = document.getElementById('login-email').value.trim().toLowerCase();
       const passwordVal = document.getElementById('login-password').value;
 
-      // Verifica credenziali se si tenta l'accesso come Admin
-      if (emailVal === 'admin@areapro.it') {
-        if (passwordVal !== 'admin123') {
-          alert('Credenziali Admin errate! Riprova.');
-          return;
-        }
+      // Cerca l'utente nel database locale
+      const user = registeredUsers.find(u => u.email === emailVal);
+
+      if (!user) {
+        alert('Questa email non è registrata. Clicca su "Registrati" in fondo per creare un nuovo account.');
+        return;
+      }
+
+      if (user.password !== passwordVal) {
+        alert('Password errata! Controlla i tuoi dati o usa la funzione "Password dimenticata?".');
+        return;
       }
 
       // Salva sessione in locale
@@ -1686,16 +1754,57 @@
     function handleRegistration(event) {
       event.preventDefault();
       const emailVal = document.getElementById('register-email').value.trim().toLowerCase();
-      
+      const passwordVal = document.getElementById('register-password').value;
+
+      // Controlla se l'utente esiste già
+      const userExists = registeredUsers.some(u => u.email === emailVal);
+      if (userExists) {
+        alert('Questa email è già registrata! Prova ad accedere.');
+        return;
+      }
+
+      // Salva nel database locale degli utenti registrati
+      registeredUsers.push({ email: emailVal, password: passwordVal });
+      localStorage.setItem('u17_registered_users', JSON.stringify(registeredUsers));
+
+      // Effettua il login dell'utente registrato
       localStorage.setItem('u17_logged_user', emailVal);
       applyUserProfile(emailVal, true);
       alert('Registrazione completata!');
       switchView('home');
     }
 
+    function handlePasswordReset(event) {
+      event.preventDefault();
+      const emailVal = document.getElementById('forgot-email').value.trim().toLowerCase();
+      const newPasswordVal = document.getElementById('forgot-new-password').value;
+
+      // Trova l'utente nel database
+      const user = registeredUsers.find(u => u.email === emailVal);
+
+      if (!user) {
+        alert('Questo indirizzo email non risulta associato ad alcun account!');
+        return;
+      }
+
+      // Aggiorna la password
+      user.password = newPasswordVal;
+      localStorage.setItem('u17_registered_users', JSON.stringify(registeredUsers));
+
+      alert('La tua password è stata aggiornata con successo! Ora puoi effettuare l\'accesso con le nuove credenziali.');
+      toggleAuthMode(false); // Riporta l'utente al form di Login
+    }
+
     function handleGoogleSuccess(isRegistrationFlow) {
       // Simulazione Google Login
-      const simulatedEmail = isRegistrationFlow ? "andrea.lisai@gmail.com" : "andrea.lisai@gmail.com";
+      const simulatedEmail = "andrea.lisai@gmail.com";
+      
+      // Assicuriamoci che l'account Google sia inserito nel DB utenti per coerenza
+      if (!registeredUsers.some(u => u.email === simulatedEmail)) {
+        registeredUsers.push({ email: simulatedEmail, password: 'google_oauth_mock_password' });
+        localStorage.setItem('u17_registered_users', JSON.stringify(registeredUsers));
+      }
+
       localStorage.setItem('u17_logged_user', simulatedEmail);
       applyUserProfile(simulatedEmail, isRegistrationFlow);
       alert('Autenticazione con Google avvenuta!');
