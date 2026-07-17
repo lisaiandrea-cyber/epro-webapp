@@ -213,7 +213,7 @@
       border-color: #091F3E;
     }
 
-    /* Checkbox personalizzato per le notifiche push */
+    /* Checkbox per le notifiche push */
     .checkbox-group {
       display: flex;
       align-items: flex-start;
@@ -334,7 +334,7 @@
       margin-top: -3px;
     }
 
-    /* Tabelle Mock Dati */
+    /* Tabelle Dati */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -368,18 +368,18 @@
       <span class="brand-subtitle">SWISS BASKET</span>
     </div>
     <div>
-      <button class="header-login-btn" onclick="switchView('login')">Login</button>
+      <button id="login-header-btn" class="header-login-btn" onclick="switchView('login')">Login</button>
     </div>
   </header>
 
-  <!-- Area Principale Contenuti -->
+  <!-- Area Principale Contenuti (Sola Lettura / Consultazione) -->
   <main class="app-container">
 
     <!-- VISTA: HOME -->
     <section id="view-home" class="view">
       <div class="content-card">
-        <h2>Benvenuto a Bordo</h2>
-        <p>Benvenuto nell'app ufficiale di <strong>U17 ePRO</strong>. Esplora i tab in basso per visualizzare calendario, classifiche, statistiche, ultime notizie o per registrarti per ricevere notifiche push in tempo reale.</p>
+        <h2>Benvenuto in U17 ePRO</h2>
+        <p>Questa è l'applicazione ufficiale di consultazione per la squadra <strong>U17 ePRO</strong>. Puoi utilizzare il menu in basso per scorrere liberamente i calendari, la classifica aggiornata, le statistiche e le ultime news.</p>
       </div>
     </section>
 
@@ -397,7 +397,7 @@
           <h2>Prossime Partite</h2>
           <table>
             <tr><th>Data</th><th>Avversario</th><th>Ora</th></tr>
-            <tr><td>24 Oatt</td><td>Riva Basket</td><td>16:00</td></tr>
+            <tr><td>24 Ott</td><td>Riva Basket</td><td>16:00</td></tr>
             <tr><td>31 Ott</td><td>SAM Massagno</td><td>14:30</td></tr>
           </table>
         </div>
@@ -420,8 +420,8 @@
       <div id="sub-view-statistiche" class="hidden">
         <div class="content-card">
           <h2>Statistiche di Squadra</h2>
-          <p>Media Punti Segnati: <strong>78.4</strong></p>
-          <p>Media Punti Subiti: <strong>64.2</strong></p>
+          <p style="margin-bottom: 8px;">Media Punti Segnati: <strong>78.4</strong></p>
+          <p style="margin-bottom: 8px;">Media Punti Subiti: <strong>64.2</strong></p>
           <p>Falli di Squadra (Media): <strong>14.5</strong></p>
         </div>
       </div>
@@ -440,8 +440,8 @@
       </div>
       <div class="content-card">
         <h2>Staff Tecnico</h2>
-        <p>Capo Allenatore: <strong>Coach Admin</strong></p>
-        <p>Vice Allenatore: <strong>Coach Assistente</strong></p>
+        <p style="margin-bottom: 8px;">Capo Allenatore: <strong>Coach Head</strong></p>
+        <p>Vice Allenatore: <strong>Coach Assistant</strong></p>
       </div>
     </section>
 
@@ -454,16 +454,16 @@
       </div>
     </section>
 
-    <!-- VISTA: LOGIN / REGISTRAZIONE -->
+    <!-- VISTA: LOGIN / REGISTRAZIONE UTENTE -->
     <section id="view-login" class="view hidden">
       <div class="content-card auth-container">
-        <!-- Form Accedi -->
+        <!-- Form Accedi standard -->
         <div id="auth-login-box">
-          <h2>Accedi</h2>
-          <form onsubmit="event.preventDefault(); alert('Accesso effettuato come Admin (Credenziali invariate)');">
+          <h2>Accedi al Profilo</h2>
+          <form onsubmit="handleLoginSuccess(event)">
             <div class="form-group">
-              <label>Email o Username Admin</label>
-              <input type="text" placeholder="Inserisci la tua email" required />
+              <label>Indirizzo Email</label>
+              <input type="email" placeholder="Inserisci la tua email" required />
             </div>
             <div class="form-group">
               <label>Password</label>
@@ -471,14 +471,14 @@
             </div>
             <button type="submit" class="btn-submit">Accedi</button>
           </form>
-          <button class="google-btn" onclick="alert('Connessione ad account Google in corso...')">
+          <button class="google-btn" onclick="handleGoogleSuccess('Accesso')">
             <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
             Accedi con Google
           </button>
           <div class="auth-toggle">Non hai un account? <span onclick="toggleAuthMode(true)">Registrati</span></div>
         </div>
 
-        <!-- Form Registrati -->
+        <!-- Form Registrati standard -->
         <div id="auth-register-box" class="hidden">
           <h2>Registrati</h2>
           <form onsubmit="handleRegistration(event)">
@@ -491,17 +491,17 @@
               <input type="password" placeholder="Crea una password" required />
             </div>
             
-            <!-- Opzione Notifiche Push -->
+            <!-- Notifiche Push Mobili/Desktop -->
             <div class="checkbox-group">
               <input type="checkbox" id="allow-push-notifications" checked />
               <label for="allow-push-notifications">
-                Desidero ricevere le notifiche push sul mio dispositivo (mobile o desktop) per risultati, news e variazioni orari.
+                Attiva le notifiche push sul tuo smartphone o PC per ricevere i risultati in tempo reale e gli aggiornamenti di U17 ePRO.
               </label>
             </div>
 
             <button type="submit" class="btn-submit">Crea Account</button>
           </form>
-          <button class="google-btn" onclick="handleGoogleRegister()">
+          <button class="google-btn" onclick="handleGoogleSuccess('Registrazione')">
             <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
             Registrati con Google
           </button>
@@ -532,7 +532,7 @@
     </div>
   </nav>
 
-  <!-- Logica Applicativa Javascript per la Navigazione e Notifiche -->
+  <!-- Logica Applicativa Navigazione e Richiesta Notifiche Push -->
   <script>
     // Cambia la vista principale dell'applicazione
     function switchView(viewId) {
@@ -579,46 +579,57 @@
       }
     }
 
-    // Gestione richiesta Notifiche Push di sistema
+    // Richiesta permessi nativi per notifiche Push (Mobile e PC)
     function requestPushPermission(callback) {
       if (!('Notification' in window)) {
-        alert('Questo dispositivo o browser non supporta le notifiche push.');
+        alert('Questo dispositivo non supporta le notifiche push native.');
         if (callback) callback();
         return;
       }
 
       Notification.requestPermission().then(permission => {
         if (permission === 'granted') {
-          alert('Notifiche push attivate con successo per U17 ePRO!');
+          alert('Notifiche push attivate correttamente sul dispositivo per U17 ePRO!');
         } else if (permission === 'denied') {
-          alert('Hai bloccato le notifiche. Puoi riattivarle dalle impostazioni del browser del tuo smartphone.');
+          alert('Notifiche disattivate. Puoi abilitarle in qualsiasi momento dalle impostazioni del browser del telefono.');
         }
         if (callback) callback();
       });
     }
 
-    // Esecuzione registrazione classica via Email
+    // Login Utente standard completato
+    function handleLoginSuccess(event) {
+      event.preventDefault();
+      document.getElementById('login-header-btn').innerText = "Profilo";
+      alert('Accesso effettuato correttamente!');
+      switchView('home');
+    }
+
+    // Registrazione Utente standard completata
     function handleRegistration(event) {
       event.preventDefault();
       const pushCheckbox = document.getElementById('allow-push-notifications');
       
       if (pushCheckbox && pushCheckbox.checked) {
         requestPushPermission(() => {
-          alert('Registrazione completata con successo!');
+          document.getElementById('login-header-btn').innerText = "Profilo";
+          alert('Registrazione completata!');
           toggleAuthMode(false);
           switchView('home');
         });
       } else {
-        alert('Registrazione completata con successo! (Notifiche push disattivate)');
+        document.getElementById('login-header-btn').innerText = "Profilo";
+        alert('Registrazione completata! (Notifiche push disattivate)');
         toggleAuthMode(false);
         switchView('home');
       }
     }
 
-    // Esecuzione registrazione via Google Account
-    function handleGoogleRegister() {
+    // Gestione Google Flow
+    function handleGoogleSuccess(type) {
       requestPushPermission(() => {
-        alert('Registrazione con account Google e sincronizzazione notifiche completata!');
+        document.getElementById('login-header-btn').innerText = "Profilo";
+        alert(`${type} tramite account Google completato con successo!`);
         toggleAuthMode(false);
         switchView('home');
       });
