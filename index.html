@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>U17 ePRO Basketball</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-full flex flex-col justify-between pb-24" 
+      x-data="{ 
+        activeTab: 'home', 
+        showLoginModal: false, 
+        isLoggedIn: false, 
+        isAdmin: false,
+        notificationsEnabled: false,
+        email: '',
+        password: '',
+        themeColor: '#f97316',
+        
+        // Liste Dati
+        matches: [],
+        news: [],
+        roster: [],
+        
+        // Form Admin per nuovi inserimenti
+        newMatch: { opponent: '', date: '', time: '', location: '', type: 'H', status: 'Prossima', score: '' },
+        newMember: { name: '', role: '', number: '', category: 'giocatori', imageUrl: '' },
+        newNews: { title: '', content: '', tag: 'Club News', imageUrl: '' },
+
+        async init() {
+          await this.loadData();
+          // Controlla sessione locale
+          const savedUser = localStorage.getItem('user');
+          if (savedUser) {
+            const user = JSON.parse(savedUser);
+            this.email = user.email;
+            this.isLoggedIn = true;
+            this.isAdmin = user.isAdmin;
+            this.notificationsEnabled = user.notifications;
+          }
+        },
+
+        async loadData() {
+          const res = await fetch('/api/data');
+          const data = await res.json();
+          this.matches = data.matches || [];
+          this.news = data.news || [];
+          this.roster = data.roster || [];
+          this.themeColor = data.themeColor || '#f97316';
+        },
+
+        async login() {
+          try {
+            const res = await fetch('/api/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: this.email, password: this.password })
+            });
+            if (!res.ok) throw new Error('Credenziali non valide');
+            const user = await res.json();
+            
+            this.isLoggedIn = true;
+            this.isAdmin = user.isAdmin;
+            this.notificationsEnabled = user.notifications;
+            localStorage.setItem('user', JSON.stringify(user));
+            this.password = '';
+            this.showLoginModal = false;
+          } catch (err) {
+            alert(err.message);
+          }
+        },
+
+        logout() {
+          this.isLoggedIn = false;
+          this.isAdmin = false;
+          this.notificationsEnabled = false;
+          this.email = '';
+          localStorage.removeItem('user');
+          this.activeTab = 'home';
+        },
+
+        async toggleNotifications() {
+          this.notificationsEnabled = !this.notificationsEnabled;
+          await fetch('/api/user/notifications', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: this.email, enabled: this.notificationsEnabled })
+          });
+          const user = JSON.parse(localStorage.getItem('user'));
+          user.notifications = this.notificationsEnabled;
+          localStorage.setItem('user', JSON.stringify(user));
+        },
+
+        // Gestione Caricamento Immagini
+        async uploadImage(event, target) {
+          const file = event.target.files[0];
+          const formData = new FormData();
+          formData.append('image', file);
+
+          try {
+            const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+            if (!res.ok) throw new Error('Errore nel caricamento del file');
+            const data = await res.json();
+            if (target === 'roster') this.newMember.imageUrl = data.imageUrl;
+            if (target === 'news') this.newNews.imageUrl = data.imageUrl;
+            alert('Immagine caricata con successo!');
+          } catch (err) {
+            alert(err.message);
+          }
+        },
+
+        // Azioni Admin
+        async saveMatch() {
+          const res = await fetch('/api/admin/match', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.newMatch)
+          });
+          const data = await res.json();
+          if (data.success) {
+            this.matches = data.matches;
+            alert('Partita inserita!');
+            this.newMatch = { opponent: '', date: '', time: '', location: '', type: 'H', status: 'Prossima', score: '' };
+          }
+        },
+
+        async saveMember() {
+          const res = await fetch('/api/admin/roster', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.newMember)
+          });
+          const data = await res.json();
+          if (data.success) {
+            this.roster = data.roster;
+            alert('Membro del roster salvato!');
+            this.newMember = { name: '', role: '', number: '', category: 'giocatori', imageUrl: '' };
+          }
+        },
+
+        async deleteMember(id) {
+          if (confirm('Sicuro di voler eliminare questo membro del roster?')) {
+            const res = await fetch(`/api/admin/roster/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) this.roster = data.roster;
+          }
+        },
+
+        async saveNews() {
+          const res = await fetch('/api/admin/news', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.newNews)
+          });
+          const data = await res.json();
+          if (data.success) {
+            this.news = data.news;
+            alert('Notizia pubblicata!');
+            this.newNews = { title: '', content: '', tag: 'Club News', imageUrl: '' };
+          }
+        },
+
+        async updateTheme(color) {
+          this.themeColor = color;
+          await fetch('/api/admin/theme', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ color })
+          });
+        }
+      }">
+
+  <!-- HEADER -->
+  <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div :style="`background-color: ${themeColor}`" class="w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-white text-lg tracking-wider shadow-lg transition-all duration-300">
+        eP
+      </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-tight">U17 <span :style="`color: ${themeColor}`" class="transition-all duration-300">ePRO</span></h1>
+        <p class="text-[10px] text-slate-400 font-semibold tracking-widest uppercase">Youth League</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center space-x-3">
+      <button @click="showLoginModal = true" class="relative p-2.5 bg-slate-800 hover:bg-slate-700 rounded-full transition text-slate-300">
+        <span x-show="!notificationsEnabled" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></span>
+        <!-- Icona Ingranaggio / Profilo -->
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTENUTO PRINCIPALE -->
+  <main class="flex-1 max-w-md mx-auto w-full px-4 py-6">
+
+    <!-- ================= HOME SECTION ================= -->
+    <section x-show="activeTab === 'home'" x-transition:enter="transition ease-out duration-300" class="space-y-6">
+      
+      <!-- Card invito Notifiche -->
+      <div x-show="!notificationsEnabled" class="bg-gradient-to-r from-slate-900 to-slate-950/60 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
+        <div class="space-y-1 pr-2">
+          <h4 class="font-bold text-sm text-slate-200">Resta sempre aggiornato! 🏀</h4>
+          <p class="text-xs text-slate-400">Ricevi notifiche push in tempo reale su punteggi e orari.</p>
+        </div>
+        <button @click="showLoginModal = true" :style="`background-color: ${themeColor}`" class="text-white font-bold text-xs px-4 py-2.5 rounded-xl transition">
+          Attiva
+        </button>
+      </div>
+
+      <!-- Prossimo Match Dinamico (Prende il primo match con stato "Prossima") -->
+      <div>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">La Prossima Sfida</h3>
+        <template x-if="matches.filter(m => m.status === 'Prossima').length > 0">
+          <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 p-6 border border-slate-800 shadow-xl">
+            <span :style="`color: ${themeColor}; border-color: ${themeColor}33; background-color: ${themeColor}1a`" class="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full border">Prossimo Match</span>
+            <h2 class="text-2xl font-black mt-4" x-text="'U17 ePRO vs ' + matches.filter(m => m.status === 'Prossima')[0].opponent"></h2>
+            <div class="mt-4 space-y-2 text-xs text-slate-300">
+              <p class="flex items-center"><span class="mr-2">📅</span> <span x-text="matches.filter(m => m.status === 'Prossima')[0].date + ' • Ore ' + matches.filter(m => m.status === 'Prossima')[0].time"></span></p>
+              <p class="flex items-center"><span class="mr-2">📍</span> <span x-text="matches.filter(m => m.status === 'Prossima')[0].location"></span></p>
+            </div>
+          </div>
+        </template>
+        <template x-if="matches.filter(m => m.status === 'Prossima').length === 0">
+          <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 text-center text-slate-400 text-sm">
+            Nessuna partita in programma al momento.
+          </div>
+        </template>
+      </div>
+
+      <!-- Ultimi Risultati -->
+      <div>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Ultimi Risultati</h3>
+        <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 space-y-4">
+          <template x-for="match in matches.filter(m => m.status === 'Terminata').slice(0, 3)" :key="match.id">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <span class="bg-emerald-500/10 text-emerald-400 text-xs font-bold px-2.5 py-1 rounded-lg border border-emerald-500/20">FINE</span>
+                <span class="text-sm font-semibold" x-text="'vs ' + match.opponent"></span>
+              </div>
+              <span class="text-sm font-bold text-slate-200" x-text="match.score"></span>
+            </div>
+          </template>
+          <template x-if="matches.filter(m => m.status === 'Terminata').length === 0">
+            <p class="text-xs text-slate-500 text-center py-2">Ancora nessun risultato inserito.</p>
+          </template>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= SEASON SECTION ================= -->
+    <section x-show="activeTab === 'season'" x-transition:enter="transition ease-out duration-300" x-data="{ seasonTab: 'partite' }" class="space-y-4">
+      <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+        <button @click="seasonTab = 'partite'" :class="seasonTab === 'partite' ? 'text-white' : 'text-slate-400' " :style="seasonTab === 'partite' ? `background-color: ${themeColor}` : ''" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all">Partite</button>
+        <button @click="seasonTab = 'classifica'" :class="seasonTab === 'classifica' ? 'text-white' : 'text-slate-400' " :style="seasonTab === 'classifica' ? `background-color: ${themeColor}` : ''" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all">Classifica</button>
+      </div>
+
+      <!-- Elenco Partite Dinamico -->
+      <div x-show="seasonTab === 'partite'" class="space-y-3">
+        <template x-for="match in matches" :key="match.id">
+          <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded" :class="match.status === 'Prossima' ? 'bg-orange-500/10 text-orange-400' : 'bg-slate-800 text-slate-400'" x-text="match.status"></span>
+              <h4 class="font-bold text-sm mt-2" x-text="'U17 ePRO vs ' + match.opponent"></h4>
+              <p class="text-xs text-slate-400" x-text="match.date + ' • ' + match.location"></p>
+            </div>
+            <span class="px-3 py-1.5 rounded-lg text-xs font-bold" :class="match.status === 'Prossima' ? 'bg-slate-800 text-slate-300' : 'bg-emerald-950 text-emerald-400'" x-text="match.status === 'Prossima' ? match.type : match.score"></span>
+          </div>
+        </template>
+        <template x-if="matches.length === 0">
+          <div class="text-center py-8 text-slate-500 text-sm">Nessuna partita registrata.</div>
+        </template>
+      </div>
+
+      <!-- Classifica -->
+      <div x-show="seasonTab === 'classifica'" class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-800 text-slate-300 uppercase font-semibold text-[10px] tracking-wider">
+            <tr>
+              <th class="py-3 px-4">Pos</th>
+              <th class="py-3 px-2">Squadra</th>
+              <th class="py-3 px-3 text-center">Pt</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800">
+            <tr class="bg-white/5">
+              <td class="py-3 px-4 font-bold" :style="`color: ${themeColor}`">1</td>
+              <td class="py-3 px-2 font-bold">U17 ePRO</td>
+              <td class="py-3 px-3 text-center font-bold" :style="`color: ${themeColor}`">24</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-bold text-slate-400">2</td>
+              <td class="py-3 px-2 font-medium">Olimpia Milano</td>
+              <td class="py-3 px-3 text-center font-bold">22</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-bold text-slate-400">3</td>
+              <td class="py-3 px-2 font-medium">Varese Basket</td>
+              <td class="py-3 px-3 text-center font-bold">18</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= ROSTER SECTION ================= -->
+    <section x-show="activeTab === 'roster'" x-transition:enter="transition ease-out duration-300" x-data="{ rosterFilter: 'giocatori' }" class="space-y-4">
+      <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+        <button @click="rosterFilter = 'giocatori'" :class="rosterFilter === 'giocatori' ? 'text-white' : 'text-slate-400'" :style="rosterFilter === 'giocatori' ? `background-color: ${themeColor}` : ''" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all">Giocatori</button>
+        <button @click="rosterFilter = 'staff'" :class="rosterFilter === 'staff' ? 'text-white' : 'text-slate-400'" :style="rosterFilter === 'staff' ? `background-color: ${themeColor}` : ''" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all">Staff</button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <template x-for="member in roster.filter(r => r.category === rosterFilter)" :key="member.id">
+          <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 relative overflow-hidden flex flex-col items-center text-center">
+            
+            <!-- Bottone Elimina per Admin -->
+            <button x-show="isAdmin" @click="deleteMember(member.id)" class="absolute top-2 right-2 bg-red-900/60 text-red-400 hover:bg-red-800 p-1.5 rounded-full transition z-10">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <!-- Numero di maglia -->
+            <div x-show="member.number" :style="`background-color: ${themeColor}`" class="absolute top-2 left-2 text-white text-[10px] font-extrabold w-6 h-6 rounded-full flex items-center justify-center" x-text="member.number"></div>
+            
+            <!-- Foto Profilo -->
+            <div class="w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-slate-800">
+              <img :src="member.imageUrl || 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=150'" class="w-full h-full object-cover">
+            </div>
+
+            <h4 class="font-bold text-sm text-slate-200" x-text="member.name"></h4>
+            <p class="text-xs font-semibold mt-1" :style="`color: ${themeColor}`" x-text="member.role"></p>
+          </div>
+        </template>
+      </div>
+
+      <template x-if="roster.filter(r => r.category === rosterFilter).length === 0">
+        <div class="text-center py-12 text-slate-500 text-sm">Nessun membro inserito in questa sezione.</div>
+      </template>
+    </section>
+
+    <!-- ================= NEWS SECTION ================= -->
+    <section x-show="activeTab === 'news'" x-transition:enter="transition ease-out duration-300" class="space-y-4">
+      <template x-for="post in news" :key="post.id">
+        <div class="bg-slate-900 rounded-2xl overflow-hidden border border-slate-800">
+          <template x-if="post.imageUrl">
+            <img :src="post.imageUrl" class="w-full h-44 object-cover">
+          </template>
+          <div class="p-4 space-y-2">
+            <div class="flex justify-between items-center">
+              <span :style="`background-color: ${themeColor}`" class="text-white text-[9px] font-extrabold uppercase px-2 py-0.5 rounded" x-text="post.tag"></span>
+              <p class="text-[10px] text-slate-400 font-medium" x-text="post.date"></p>
+            </div>
+            <h3 class="font-bold text-base leading-tight text-slate-200" x-text="post.title"></h3>
+            <p class="text-xs text-slate-300 leading-relaxed" x-text="post.content"></p>
+          </div>
+        </div>
+      </template>
+      <template x-if="news.length === 0">
+        <div class="text-center py-12 text-slate-500 text-sm">Nessuna notizia pubblicata.</div>
+      </template>
+    </section>
+
+    <!-- ================= ADMIN PANEL SECTION ================= -->
+    <section x-show="activeTab === 'admin' && isAdmin" x-transition:enter="transition ease-out duration-300" class="space-y-6">
+      <div class="border-b border-slate-800 pb-3">
+        <h2 class="text-xl font-extrabold" :style="`color: ${themeColor}`">Pannello Controllo Admin</h2>
+        <p class="text-xs text-slate-400">Modifica l'aspetto, il roster, le partite e le news in tempo reale.</p>
+      </div>
+
+      <!-- 1. Stile & Aspetto dell'App -->
+      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">Stile & Colori</h3>
+        <div class="flex items-center space-x-4">
+          <input type="color" :value="themeColor" @change="updateTheme($event.target.value)" class="w-12 h-12 bg-transparent rounded cursor-pointer border border-slate-700">
+          <div>
+            <p class="text-xs text-slate-200 font-semibold">Colore Principale</p>
+            <p class="text-[10px] text-slate-400" x-text="'Attuale: ' + themeColor"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Form Nuova Partita -->
+      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">Aggiungi Partita</h3>
+        <input type="text" x-model="newMatch.opponent" placeholder="Avversario (es. Cantù Basket)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200">
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" x-model="newMatch.date" placeholder="Data (es. 25 Lug 2026)" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200">
+          <input type="text" x-model="newMatch.time" placeholder="Ora (es. 18:00)" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200">
+        </div>
+        <input type="text" x-model="newMatch.location" placeholder="Palazzetto e Città" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200">
+        <div class="grid grid-cols-3 gap-2">
+          <select x-model="newMatch.type" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs text-slate-200">
+            <option value="H">Casa (H)</option>
+            <option value="A">Trasferta (A)</option>
+          </select>
+          <select x-model="newMatch.status" class="bg-slate-950 border border-slate-800 rounded-xl px-2 py-2 text-xs text-slate-200">
+            <option value="Prossima">Prossima</option>
+            <option value="Terminata">Terminata</option>
+          </select>
+          <input type="text" x-model="newMatch.score" placeholder="Punteggio (es. 75-70)" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200">
+        </div>
+        <button @click="saveMatch()" :style="`background-color: ${themeColor}`" class="w-full text-white font-bold text-xs py-2.5 rounded-xl transition">Aggiungi Partita</button>
+      </div>
+
+      <!-- 3. Form Roster / Staff con Foto -->
+      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">Gestione Roster & Staff</h3>
+        <input type="text" x-model="newMember.name" placeholder="Nome e Cognome" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200">
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" x-model="newMember.role" placeholder="Ruolo (es. Playmaker / Coach)" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200">
+          <input type="number" x-model="newMember.number" placeholder="Numero Maglia (Opzionale)" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200">
+        </div>
+        <select x-model="newMember.category" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200">
+          <option value="giocatori">Giocatore (Roster)</option>
+          <option value="staff">Staff Tecnico</option>
+        </select>
+        <div>
+          <label class="block text-[10px] text-slate-400 font-bold mb-1">Carica Foto Membro</label>
+          <input type="file" @change="uploadImage($event, 'roster')" class="text-xs text-slate-400 file:bg-slate-800 file:text-white file:border-none file:px-3 file:py-1.5 file:rounded-xl file:cursor-pointer">
+        </div>
+        <button @click="saveMember()" :style="`background-color: ${themeColor}`" class="w-full text-white font-bold text-xs py-2.5 rounded-xl transition">Salva nel Roster</button>
+      </div>
+
+      <!-- 4. Form Notizia con Foto -->
+      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">Crea Comunicato / News</h3>
+        <select x-model="newNews.tag" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200">
+          <option value="Club News">Club News</option>
+          <option value="Match Recap">Match Recap</option>
+          <option value="Convocazioni">Convocazioni</option>
+        </select>
+        <input type="text" x-model="newNews.title" placeholder="Titolo della Notizia" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200">
+        <textarea x-model="newNews.content" placeholder="Scrivi qui l'articolo..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 h-24"></textarea>
+        <div>
+          <label class="block text-[10px] text-slate-400 font-bold mb-1">Carica Foto Copertina News</label>
+          <input type="file" @change="uploadImage($event, 'news')" class="text-xs text-slate-400 file:bg-slate-800 file:text-white file:border-none file:px-3 file:py-1.5 file:rounded-xl file:cursor-pointer">
+        </div>
+        <button @click="saveNews()" :style="`background-color: ${themeColor}`" class="w-full text-white font-bold text-xs py-2.5 rounded-xl transition">Pubblica Articolo</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODALE LOGIN / IMPOSTAZIONI ================= -->
+  <div x-show="showLoginModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div @click.away="showLoginModal = false" class="bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-2xl border border-slate-800 p-6 space-y-6 relative">
+      
+      <button @click="showLoginModal = false" class="absolute top-4 right-4 text-slate-400 hover:text-slate-100">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+
+      <!-- NON ACCEDUTO -->
+      <div x-show="!isLoggedIn" class="space-y-4">
+        <div class="text-center">
+          <h3 class="text-lg font-bold">Accesso Area Riservata</h3>
+          <p class="text-xs text-slate-400 mt-1">Accedi per sbloccare le notifiche o per gestire la Web App se sei un Admin.</p>
+        </div>
+        <form @submit.prevent="login()" class="space-y-3">
+          <input type="email" x-model="email" required placeholder="Email" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-orange-500">
+          <input type="password" x-model="password" required placeholder="Password" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-orange-500">
+          <button type="submit" :style="`background-color: ${themeColor}`" class="w-full text-white font-bold py-3 rounded-xl transition text-sm">Accedi</button>
+        </form>
+      </div>
+
+      <!-- ACCEDUTO -->
+      <div x-show="isLoggedIn" class="space-y-6">
+        <div class="text-center">
+          <h3 class="text-lg font-bold">Profilo Utente</h3>
+          <p class="text-xs font-semibold" :style="`color: ${themeColor}`" x-text="email"></p>
+        </div>
+
+        <div class="bg-slate-950 rounded-xl p-4 border border-slate-800 flex items-center justify-between">
+          <div>
+            <h4 class="font-bold text-sm text-slate-200">Notifiche Push</h4>
+            <p class="text-[11px] text-slate-400">Ricevi avvisi su orari e risultati in tempo reale.</p>
+          </div>
+          <button @click="toggleNotifications()" :class="notificationsEnabled ? 'bg-emerald-600' : 'bg-slate-800'" class="relative inline-flex h-6 w-11 rounded-full border-2 border-transparent transition-colors duration-200">
+            <span :class="notificationsEnabled ? 'translate-x-5' : 'translate-x-0'" class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200"></span>
+          </button>
+        </div>
+
+        <div class="flex space-x-3">
+          <button @click="showLoginModal = false" class="flex-1 bg-slate-800 text-slate-200 py-3 rounded-xl text-xs font-bold">Chiudi</button>
+          <button @click="logout()" class="flex-1 bg-red-950/40 text-red-400 py-3 rounded-xl text-xs font-bold border border-red-900/30">Disconnetti</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= BOTTOM NAVIGATION BAR ================= -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 py-2 px-4 flex justify-around items-center z-50 max-w-md mx-auto rounded-t-2xl shadow-2xl">
+    
+    <button @click="activeTab = 'home'" :class="activeTab === 'home' ? 'font-bold' : 'text-slate-400'" :style="activeTab === 'home' ? `color: ${themeColor}` : ''" class="flex flex-col items-center space-y-1 py-1 transition flex-1">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+      <span class="text-[10px]">Home</span>
+    </button>
+
+    <button @click="activeTab = 'season'" :class="activeTab === 'season' ? 'font-bold' : 'text-slate-400'" :style="activeTab === 'season' ? `color: ${themeColor}` : ''" class="flex flex-col items-center space-y-1 py-1 transition flex-1">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+      <span class="text-[10px]">Stagione</span>
+    </button>
+
+    <button @click="activeTab = 'roster'" :class="activeTab === 'roster' ? 'font-bold' : 'text-slate-400'" :style="activeTab === 'roster' ? `color: ${themeColor}` : ''" class="flex flex-col items-center space-y-1 py-1 transition flex-1">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      <span class="text-[10px]">Roster</span>
+    </button>
+
+    <button @click="activeTab = 'news'" :class="activeTab === 'news' ? 'font-bold' : 'text-slate-400'" :style="activeTab === 'news' ? `color: ${themeColor}` : ''" class="flex flex-col items-center space-y-1 py-1 transition flex-1">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+      <span class="text-[10px]">News</span>
+    </button>
+
+    <!-- Pulsante Admin Visibile Solo ai Loggati Admin -->
+    <button x-show="isAdmin" @click="activeTab = 'admin'" :class="activeTab === 'admin' ? 'text-red-500 font-bold' : 'text-red-400/60'" class="flex flex-col items-center space-y-1 py-1 transition flex-1">
+      <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+      <span class="text-[10px] text-red-500">Admin</span>
+    </button>
+  </nav>
+
+</body>
+</html>
