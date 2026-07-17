@@ -662,8 +662,8 @@
         <span class="header-title">U17 ePRO</span>
       </div>
       <div class="header-controls">
-        <!-- Tasto per accedere rapidamente all'Admin Control Panel -->
-        <div class="header-icon-btn" id="header-admin-btn" onclick="switchView('admin')" title="Pannello Admin">
+        <!-- Tasto Pannello Admin (HIDDEN di default - Solo per Admin loggato) -->
+        <div class="header-icon-btn hidden" id="header-admin-btn" onclick="switchView('admin')" title="Pannello Admin">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
         </div>
         <div class="header-icon-btn" id="header-profile-btn" onclick="switchView('login')">
@@ -784,14 +784,27 @@
       </section>
 
 
-      <!-- VISTA: LOGIN -->
+      <!-- VISTA: LOGIN & PROFILO -->
       <section id="view-login" class="view hidden">
         <div class="login-container">
-          <div class="login-top-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+          
+          <!-- Stato: UTENTE GIÀ LOGGATO -->
+          <div id="auth-logged-box" class="hidden" style="width: 100%; text-align: center;">
+            <div class="login-top-icon" style="margin: 0 auto 24px auto;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <h1 class="login-title">Il tuo profilo</h1>
+            <p class="login-subtitle" id="logged-user-email-info" style="margin-bottom: 20px;">Sei loggato come: email@example.com</p>
+            <div class="login-card">
+              <button onclick="handleLogout()" class="submit-btn-red" style="background: var(--accent-red); margin-top: 10px;">Scollegati (Logout)</button>
+            </div>
           </div>
 
+          <!-- Stato: SCHERMATA ACCESSO -->
           <div id="auth-login-box" style="width:100%;">
+            <div class="login-top-icon" style="margin: 0 auto 24px auto;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            </div>
             <h1 class="login-title">Bentornato nell'App</h1>
             <p class="login-subtitle" style="text-align: center;">Accedi al tuo account</p>
             <div class="login-card">
@@ -801,14 +814,18 @@
                 <div class="input-label-row"><span class="input-label">Email</span></div>
                 <div class="input-wrapper"><input type="email" id="login-email" class="custom-input" placeholder="you@example.com" required /></div>
                 <div class="input-label-row"><span class="input-label">Password</span></div>
-                <div class="input-wrapper"><input type="password" class="custom-input" placeholder="••••••••" required /></div>
+                <div class="input-wrapper"><input type="password" id="login-password" class="custom-input" placeholder="••••••••" required /></div>
                 <button type="submit" class="submit-btn-red">Accedi</button>
               </form>
             </div>
             <div class="auth-bottom-switch">Non hai un account? <span onclick="toggleAuthMode(true)">Registrati</span></div>
           </div>
 
+          <!-- Stato: SCHERMATA REGISTRAZIONE -->
           <div id="auth-register-box" class="hidden" style="width:100%;">
+            <div class="login-top-icon" style="margin: 0 auto 24px auto;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            </div>
             <h1 class="login-title">Crea un Profilo</h1>
             <p class="login-subtitle" style="text-align: center;">Iscriviti a U17 Area Pro</p>
             <div class="login-card">
@@ -877,7 +894,7 @@
        DATABASE DI STATO DELL'APP (CON PERSISTENZA LOCALSTORAGE)
        ========================================== */
 
-    // Squadre con immagini reali di default (URL segnaposto moderni per il test iniziale)
+    // Squadre con immagini reali di default
     let teams = JSON.parse(localStorage.getItem('u17_teams')) || [
       { id: 'ap', name: 'AREA PRO', logo: 'public/logo.png', points: 8 },
       { id: 'db', name: 'DERTHONA BASKET', logo: 'https://images.placeholders.dev/?width=60&height=60&text=DB&bgColor=%23121e33&textColor=%23ffffff', points: 10 },
@@ -932,6 +949,16 @@
        GESTIONE NAVIGAZIONE
        ========================================== */
     function switchView(viewId) {
+      // Blocco di sicurezza manuale per la vista Admin
+      if (viewId === 'admin') {
+        const currentUser = localStorage.getItem('u17_logged_user');
+        if (currentUser !== 'admin@areapro.it') {
+          alert('Accesso negato. Questa sezione è riservata solo all’amministratore.');
+          switchView('login');
+          return;
+        }
+      }
+
       document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
       document.querySelectorAll('.nav-tab-item').forEach(item => item.classList.remove('active'));
 
@@ -1577,16 +1604,35 @@
       if (isRegister) {
         document.getElementById('auth-login-box').classList.add('hidden');
         document.getElementById('auth-register-box').classList.remove('hidden');
+        document.getElementById('auth-logged-box').classList.add('hidden');
       } else {
         document.getElementById('auth-register-box').classList.add('hidden');
         document.getElementById('auth-login-box').classList.remove('hidden');
+        document.getElementById('auth-logged-box').classList.add('hidden');
       }
     }
 
     function applyUserProfile(email, isFirstTimeRegistration) {
-      const displayEmail = email || "ospite@areapro.it";
+      const adminBtn = document.getElementById('header-admin-btn');
+
+      if (!email) {
+        // Caso: Nessun Utente (Ospite / Scollegato)
+        document.getElementById('username-display').textContent = "Ospite";
+        document.getElementById('main-welcome-heading').innerHTML = `Benvenuto nell'app ufficiale dell'U17 Eccellenza di Area Pro`;
+        document.getElementById('header-profile-btn').innerHTML = `
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        `;
+        adminBtn.classList.add('hidden');
+        
+        // Pannelli di autenticazione visibili
+        document.getElementById('auth-login-box').classList.remove('hidden');
+        document.getElementById('auth-register-box').classList.add('hidden');
+        document.getElementById('auth-logged-box').classList.add('hidden');
+        return;
+      }
+
+      const displayEmail = email;
       let userName = displayEmail.split('@')[0];
-      
       userName = userName.replace(/[._]/g, ' ');
       userName = userName.charAt(0).toUpperCase() + userName.slice(1);
 
@@ -1601,11 +1647,37 @@
       document.getElementById('header-profile-btn').innerHTML = `
         <div class="user-avatar-circle">${initials}</div>
       `;
+
+      // Controllo Esclusivo Credenziali Admin
+      if (displayEmail === 'admin@areapro.it') {
+        adminBtn.classList.remove('hidden');
+      } else {
+        adminBtn.classList.add('hidden');
+      }
+
+      // Impostazione Vista Profilo Loggato
+      document.getElementById('logged-user-email-info').textContent = `Sei loggato come: ${displayEmail}`;
+      document.getElementById('auth-login-box').classList.add('hidden');
+      document.getElementById('auth-register-box').classList.add('hidden');
+      document.getElementById('auth-logged-box').classList.remove('hidden');
     }
 
     function handleLoginSuccess(event) {
       event.preventDefault();
-      const emailVal = document.getElementById('login-email').value;
+      const emailVal = document.getElementById('login-email').value.trim().toLowerCase();
+      const passwordVal = document.getElementById('login-password').value;
+
+      // Verifica credenziali se si tenta l'accesso come Admin
+      if (emailVal === 'admin@areapro.it') {
+        if (passwordVal !== 'admin123') {
+          alert('Credenziali Admin errate! Riprova.');
+          return;
+        }
+      }
+
+      // Salva sessione in locale
+      localStorage.setItem('u17_logged_user', emailVal);
+
       applyUserProfile(emailVal, false);
       alert('Accesso effettuato con successo!');
       switchView('home');
@@ -1613,21 +1685,41 @@
 
     function handleRegistration(event) {
       event.preventDefault();
-      const emailVal = document.getElementById('register-email').value;
+      const emailVal = document.getElementById('register-email').value.trim().toLowerCase();
+      
+      localStorage.setItem('u17_logged_user', emailVal);
       applyUserProfile(emailVal, true);
       alert('Registrazione completata!');
-      toggleAuthMode(false);
       switchView('home');
     }
 
     function handleGoogleSuccess(isRegistrationFlow) {
-      applyUserProfile("Andrea Lisai", isRegistrationFlow);
+      // Simulazione Google Login
+      const simulatedEmail = isRegistrationFlow ? "andrea.lisai@gmail.com" : "andrea.lisai@gmail.com";
+      localStorage.setItem('u17_logged_user', simulatedEmail);
+      applyUserProfile(simulatedEmail, isRegistrationFlow);
       alert('Autenticazione con Google avvenuta!');
       switchView('home');
     }
 
+    function handleLogout() {
+      if (confirm("Sei sicuro di voler effettuare il logout?")) {
+        localStorage.removeItem('u17_logged_user');
+        applyUserProfile(null, false);
+        alert('Disconnessione completata.');
+        switchView('home');
+      }
+    }
+
     // Rendering iniziale all'avvio
     window.onload = function() {
+      // Ripristina sessione utente se presente
+      const loggedUser = localStorage.getItem('u17_logged_user');
+      if (loggedUser) {
+        applyUserProfile(loggedUser, false);
+      } else {
+        applyUserProfile(null, false);
+      }
       renderAllViews();
     };
   </script>
