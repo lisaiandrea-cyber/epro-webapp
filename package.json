@@ -1,4 +1,4 @@
-{
+{{
   "name": "epro-webapp",
   "version": "1.0.0",
   "description": "",
@@ -6,12 +6,8 @@
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^4.19.2",
     "multer": "^1.4.5-lts.1"
   }
 }
