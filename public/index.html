@@ -63,6 +63,7 @@
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid var(--border-color);
+      background-color: var(--bg-dark);
     }
 
     .header-logo-section {
@@ -72,7 +73,6 @@
       cursor: pointer;
     }
 
-    /* Icona ripristinata con immagine della cartella public */
     .logo-image {
       width: 40px;
       height: 40px;
@@ -114,7 +114,7 @@
       color: var(--text-white);
     }
 
-    /* Viste */
+    /* Viste generali */
     .view {
       display: flex;
       flex-direction: column;
@@ -131,7 +131,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Titolo di benvenuto personalizzato */
+    /* Titolo di benvenuto personalizzabile */
     .big-welcome-title {
       font-size: 22px;
       font-weight: 800;
@@ -144,7 +144,7 @@
       color: var(--accent-orange);
     }
 
-    /* Grid record e posizione */
+    /* Grid Home Page */
     .stats-row-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -156,7 +156,6 @@
       background-color: var(--bg-card);
       border-radius: 18px;
       padding: 16px;
-      position: relative;
     }
 
     .mini-stats-header {
@@ -192,7 +191,6 @@
       margin-top: 4px;
     }
 
-    /* Prossima partita */
     .section-header-row {
       display: flex;
       justify-content: space-between;
@@ -212,6 +210,7 @@
       text-decoration: none;
     }
 
+    /* Card Prossima Partita */
     .next-match-card {
       background-color: var(--bg-card);
       border-radius: 20px;
@@ -237,8 +236,8 @@
       font-size: 20px;
       font-weight: 800;
       margin-bottom: 20px;
-      position: relative;
       z-index: 2;
+      position: relative;
     }
 
     .match-info-meta-row {
@@ -246,8 +245,8 @@
       gap: 16px;
       font-size: 13px;
       color: var(--text-muted);
-      position: relative;
       z-index: 2;
+      position: relative;
     }
 
     .meta-item {
@@ -261,7 +260,6 @@
       font-weight: 600;
     }
 
-    /* Watermark pallone basket */
     .basketball-watermark {
       position: absolute;
       right: -20px;
@@ -273,7 +271,6 @@
       pointer-events: none;
     }
 
-    /* Accesso rapido */
     .quick-access-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -290,32 +287,198 @@
       justify-content: center;
       gap: 10px;
       cursor: pointer;
-      text-align: center;
-      transition: transform 0.2s;
     }
 
-    .quick-btn-card:active {
-      transform: scale(0.95);
+    .quick-btn-icon { color: var(--accent-orange); }
+    .quick-btn-label { font-size: 11px; font-weight: 700; }
+
+
+    /* --- STRUTTURA SCORREVOLE ORIZZONTALE (PAGINA STAGIONE) --- */
+    .season-tabs-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .season-tabs-nav::-webkit-scrollbar { display: none; }
+
+    .season-tab-pill {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 10px 18px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
 
-    .quick-btn-icon {
-      color: var(--accent-orange);
+    .season-tab-pill.active {
+      background-color: var(--accent-red);
+      color: var(--text-white);
+      border-color: var(--accent-red);
+      box-shadow: 0 4px 12px rgba(229, 62, 62, 0.25);
     }
 
-    .quick-btn-label {
+    /* Slider Orizzontale per le 3 sezioni */
+    .season-horizontal-carousel {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      gap: 20px;
+      margin: 0 -16px;
+      padding: 0 16px 20px 16px;
+    }
+    .season-horizontal-carousel::-webkit-scrollbar { display: none; }
+
+    .season-carousel-slide {
+      flex: 0 0 100%;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Sub-card per il calendario delle partite */
+    .match-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .match-row-card {
+      background-color: var(--bg-card);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-left: 4px solid var(--border-color);
+    }
+    .match-row-card.disputata {
+      border-left-color: #34A853;
+    }
+    .match-row-card.prossima {
+      border-left-color: var(--accent-orange);
+    }
+
+    .match-row-header {
+      display: flex;
+      justify-content: space-between;
       font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .match-row-body {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .match-row-teams {
+      font-size: 15px;
       font-weight: 700;
     }
 
-
-    /* --- VISTA LOGIN/REGISTRAZIONE --- */
-    .login-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-top: 10px;
+    .match-row-result {
+      font-size: 16px;
+      font-weight: 800;
+      background-color: rgba(255,255,255,0.05);
+      padding: 4px 10px;
+      border-radius: 8px;
     }
 
+    /* Tabella Classifica */
+    .classifica-wrapper {
+      background-color: var(--bg-card);
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .classifica-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .classifica-table th, .classifica-table td {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .classifica-table th {
+      background-color: rgba(255, 255, 255, 0.02);
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .classifica-table tr {
+      border-bottom: 1px solid rgba(30, 44, 66, 0.5);
+    }
+    .classifica-table tr:last-child { border-bottom: none; }
+
+    .classifica-table tr.highlight-ap {
+      background-color: rgba(255, 140, 66, 0.08);
+    }
+
+    .rank-number {
+      font-weight: 800;
+      color: var(--text-muted);
+      width: 24px;
+    }
+    .highlight-ap .rank-number { color: var(--accent-orange); }
+
+    .team-name-cell { font-weight: 600; }
+    .points-cell { font-weight: 800; text-align: right; }
+
+
+    /* --- VISTA ROSTER (SQUADRA) --- */
+    .roster-list { display: flex; flex-direction: column; gap: 12px; }
+    .player-card {
+      background-color: var(--bg-card);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .player-left { display: flex; align-items: center; gap: 12px; }
+    .player-number {
+      background-color: rgba(229, 62, 62, 0.15);
+      color: var(--accent-red);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+    .player-name { font-weight: 600; font-size: 15px; }
+    .player-role { font-size: 12px; color: var(--text-muted); }
+
+
+    /* --- VISTA NEWS --- */
+    .news-card { background-color: var(--bg-card); border-radius: 16px; overflow: hidden; margin-bottom: 16px; }
+    .news-content { padding: 16px; }
+    .news-date { font-size: 11px; font-weight: 700; color: var(--accent-orange); margin-bottom: 8px; text-transform: uppercase; }
+    .news-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+    .news-excerpt { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
+
+
+    /* --- VISTA LOGIN/REGISTRAZIONE --- */
+    .login-container { display: flex; flex-direction: column; align-items: center; padding-top: 10px; }
     .login-top-icon {
       background-color: var(--accent-red);
       width: 60px;
@@ -327,449 +490,46 @@
       margin-bottom: 24px;
       box-shadow: 0 8px 20px rgba(229, 62, 62, 0.3);
     }
-
-    .login-title {
-      font-size: 24px;
-      font-weight: 800;
-      text-align: center;
-      line-height: 1.2;
-      margin-bottom: 8px;
-    }
-
-    .login-subtitle {
-      color: var(--text-muted);
-      font-size: 15px;
-      margin-bottom: 30px;
-    }
-
-    .login-card {
-      background-color: rgba(18, 30, 51, 0.5);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      width: 100%;
-      padding: 24px;
-    }
-
-    /* Pulsante Google */
+    .login-title { font-size: 24px; font-weight: 800; text-align: center; margin-bottom: 8px; }
+    .login-subtitle { color: var(--text-muted); font-size: 15px; margin-bottom: 30px; }
+    .login-card { background-color: rgba(18, 30, 51, 0.5); border: 1px solid var(--border-color); border-radius: 20px; width: 100%; padding: 24px; }
     .google-btn-dark {
-      background-color: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-white);
-      width: 100%;
-      padding: 14px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      cursor: pointer;
-      margin-bottom: 24px;
-      transition: background-color 0.2s;
+      background-color: transparent; border: 1px solid var(--border-color); color: var(--text-white);
+      width: 100%; padding: 14px; border-radius: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; margin-bottom: 24px;
     }
-
-    .google-btn-dark:hover {
-      background-color: rgba(255,255,255,0.05);
-    }
-
-    /* Divisore */
-    .or-divider {
-      display: flex;
-      align-items: center;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      margin-bottom: 24px;
-    }
-
-    .or-divider::before, .or-divider::after {
-      content: '';
-      flex: 1;
-      border-bottom: 1px solid var(--border-color);
-    }
-
+    .or-divider { display: flex; align-items: center; text-align: center; color: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-bottom: 24px; }
+    .or-divider::before, .or-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-color); }
     .or-divider:not(:empty)::before { margin-right: .75em; }
     .or-divider:not(:empty)::after { margin-left: .75em; }
-
-    /* Campi Input */
-    .input-label-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .input-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-white);
-    }
-
-    .forgot-pass-link {
-      color: var(--accent-red);
-      font-size: 12px;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .input-wrapper {
-      position: relative;
-      margin-bottom: 20px;
-    }
-
-    .input-icon {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-    }
-
-    .custom-input {
-      width: 100%;
-      background-color: var(--bg-input);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 14px 14px 14px 44px;
-      color: var(--text-white);
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .custom-input:focus {
-      border-color: var(--accent-red);
-    }
-
-    /* Bottone Submit */
-    .submit-btn-red {
-      background-color: var(--accent-red);
-      color: var(--text-white);
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(229, 62, 62, 0.2);
-      transition: background-color 0.2s;
-    }
-
-    .submit-btn-red:hover {
-      background-color: #d32f2f;
-    }
-
-    .auth-bottom-switch {
-      margin-top: 24px;
-      text-align: center;
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-
-    .auth-bottom-switch span {
-      color: var(--accent-red);
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .push-notification-opt {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 20px;
-      cursor: pointer;
-    }
-
-    .push-notification-opt input {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--accent-red);
-      cursor: pointer;
-      margin-top: 2px;
-    }
-
-    .push-notification-opt label {
-      font-size: 12px;
-      color: var(--text-muted);
-      line-height: 1.4;
-      cursor: pointer;
-    }
-
-
-    /* --- VISTA STAGIONE --- */
-    .season-hero-card {
-      background: radial-gradient(circle at top right, rgba(229, 62, 62, 0.15), var(--bg-card));
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 24px;
-    }
-
-    .season-hero-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .season-hero-subtitle {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--accent-red);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .season-hero-champ {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .season-hero-title {
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 12px;
-    }
-
-    .season-hero-desc {
-      font-size: 14px;
-      color: var(--text-muted);
-      line-height: 1.5;
-      margin-bottom: 24px;
-    }
-
-    .season-hero-buttons {
-      display: flex;
-      gap: 12px;
-    }
-
-    .hero-btn {
-      flex: 1;
-      padding: 12px;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      cursor: pointer;
-      border: none;
-    }
-
-    .hero-btn-red {
-      background-color: var(--accent-red);
-      color: var(--text-white);
-    }
-
-    .hero-btn-outline {
-      background-color: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-white);
-    }
-
-    /* Griglia Statistiche 2x2 */
-    .stats-2x2-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .stats-grid-card {
-      background-color: var(--bg-card);
-      border-radius: 18px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 130px;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .stats-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .stats-card-icon {
-      color: var(--accent-red);
-    }
-
-    .stats-card-chevron {
-      color: var(--text-muted);
-    }
-
-    .stats-card-body {
-      margin-top: 16px;
-    }
-
-    .stats-card-number {
-      font-size: 24px;
-      font-weight: 800;
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-
-    .stats-card-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-
-    /* --- VISTA ROSTER (SQUADRA) --- */
-    .roster-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .player-card {
-      background-color: var(--bg-card);
-      border-radius: 14px;
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .player-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .player-number {
-      background-color: rgba(229, 62, 62, 0.15);
-      color: var(--accent-red);
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 14px;
-    }
-
-    .player-name {
-      font-weight: 600;
-      font-size: 15px;
-    }
-
-    .player-role {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-
-    /* --- VISTA NEWS --- */
-    .news-card {
-      background-color: var(--bg-card);
-      border-radius: 16px;
-      overflow: hidden;
-      margin-bottom: 16px;
-    }
-
-    .news-content {
-      padding: 16px;
-    }
-
-    .news-date {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--accent-orange);
-      margin-bottom: 8px;
-      text-transform: uppercase;
-    }
-
-    .news-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      line-height: 1.3;
-    }
-
-    .news-excerpt {
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
+    .input-label-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .input-label { font-size: 13px; font-weight: 600; }
+    .forgot-pass-link { color: var(--accent-red); font-size: 12px; text-decoration: none; }
+    .input-wrapper { position: relative; margin-bottom: 20px; }
+    .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+    .custom-input { width: 100%; background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 14px 14px 44px; color: var(--text-white); font-size: 14px; outline: none; }
+    .custom-input:focus { border-color: var(--accent-red); }
+    .submit-btn-red { background-color: var(--accent-red); color: var(--text-white); width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(229, 62, 62, 0.2); }
+    .auth-bottom-switch { margin-top: 24px; text-align: center; font-size: 14px; color: var(--text-muted); }
+    .auth-bottom-switch span { color: var(--accent-red); font-weight: 600; cursor: pointer; }
+    .push-notification-opt { display: flex; gap: 10px; margin-bottom: 20px; }
+    .push-notification-opt input { width: 18px; height: 18px; accent-color: var(--accent-red); margin-top: 2px; }
+    .push-notification-opt label { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
 
 
     /* --- NAVIGATION BOTTOM BAR --- */
     .bottom-nav-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background-color: var(--bg-card);
-      border-top: 1px solid var(--border-color);
-      height: 75px;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 1000;
+      position: fixed; bottom: 0; left: 0; right: 0; background-color: var(--bg-card); border-top: 1px solid var(--border-color); height: 75px; display: flex; justify-content: space-around; align-items: center; z-index: 1000;
     }
 
     @media (min-width: 480px) {
-      .bottom-nav-bar {
-        max-width: 480px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-left: 1px solid var(--border-color);
-        border-right: 1px solid var(--border-color);
-      }
+      .bottom-nav-bar { max-width: 480px; left: 50%; transform: translateX(-50%); border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color); }
     }
 
-    .nav-tab-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      font-size: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      flex: 1;
-      height: 100%;
-      gap: 4px;
-      transition: color 0.2s;
-    }
-
-    .nav-tab-item svg {
-      width: 20px;
-      height: 20px;
-      fill: currentColor;
-    }
-
-    .nav-tab-item.active {
-      color: var(--text-white);
-    }
-
-    .nav-tab-item.active .tab-icon-wrapper {
-      background: var(--gradient-primary);
-      width: 52px;
-      height: 40px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(229, 45, 39, 0.3);
-    }
-
-    .nav-tab-item.active svg {
-      fill: var(--text-white);
-    }
+    .nav-tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 10px; font-weight: 700; cursor: pointer; flex: 1; height: 100%; gap: 4px; }
+    .nav-tab-item svg { width: 20px; height: 20px; fill: currentColor; }
+    .nav-tab-item.active { color: var(--text-white); }
+    .nav-tab-item.active .tab-icon-wrapper { background: var(--gradient-primary); width: 52px; height: 40px; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(229, 45, 39, 0.3); }
+    .nav-tab-item.active svg { fill: var(--text-white); }
   </style>
 </head>
 <body>
@@ -779,27 +539,23 @@
     <!-- App Header -->
     <header class="app-header">
       <div class="header-logo-section" onclick="switchView('home')">
-        <!-- Icona ripristinata dall'immagine presente nella cartella public -->
         <img src="public/logo.png" class="logo-image" alt="Logo U17 ePRO">
         <span class="header-title">U17 ePRO</span>
       </div>
-      <!-- Icona in alto a destra per l'accesso profilo utente (unico punto di login/logout) -->
       <div class="header-profile-btn" id="header-profile-btn" onclick="switchView('login')">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
       </div>
     </header>
 
-    <!-- MAIN APP WRAPPER -->
+    <!-- MAIN WRAPPER -->
     <main style="flex: 1;">
 
       <!-- VISTA: HOME (DASHBOARD) -->
       <section id="view-home" class="view">
-        <!-- Titolo di benvenuto con layout pulito e dinamico -->
-        <h1 class="big-welcome-title">
+        <h1 class="big-welcome-title" id="main-welcome-heading">
           Benvenuto/Bentornato <span id="username-display">Ospite</span> nell'app ufficiale dell'U17 Eccellenza di Area Pro
         </h1>
 
-        <!-- Record e Posizione Grid -->
         <div class="stats-row-grid">
           <div class="mini-stats-card">
             <div class="mini-stats-header">
@@ -808,7 +564,7 @@
                 <svg width="14" height="14" fill="#ff8c42" viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.67 4.39 4.94C8.25 14.28 10.5 16 13 16v3h-3v2h8v-2h-3v-3c2.5 0 4.75-1.72 5.61-4.06C22.08 11.67 24 9.55 24 7V6c0-1.1-.9-2-2-2zM5 7h2v3H5V7zm14 3h-2V7h2v3z"/></svg>
               </div>
             </div>
-            <div class="mini-stats-value">2-1</div>
+            <div class="mini-stats-value">4-1</div>
             <div class="mini-stats-subtitle">V-P</div>
           </div>
 
@@ -824,7 +580,6 @@
           </div>
         </div>
 
-        <!-- Prossima Partita -->
         <div class="section-header-row">
           <h2 class="section-title">Prossima partita</h2>
           <a href="#" class="section-link-orange" onclick="switchView('stagione')">Vedi tutte</a>
@@ -833,171 +588,191 @@
         <div class="next-match-card">
           <div class="home-tag-badge">In Casa</div>
           <div class="match-versus-title">AREA PRO vs Metro Ballers</div>
-          
           <div class="match-info-meta-row">
             <div class="meta-item meta-item-orange">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
               Farm Arena
             </div>
             <div class="meta-item">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              21/7 • 09:23
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              Domenica • 16:00
             </div>
           </div>
-
-          <!-- Filigrana Pallone da Basket -->
           <svg class="basketball-watermark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="12" cy="12" r="10"></circle>
             <path d="M6.2 6.2c2.4 2.4 2.4 6.4 0 8.8M17.8 6.2c-2.4 2.4-2.4 6.4 0 8.8M2 12h20M12 2v20"></path>
           </svg>
         </div>
 
-        <!-- Accesso rapido -->
         <h2 class="section-title" style="margin-bottom: 12px;">Accesso rapido</h2>
         <div class="quick-access-grid">
           <div class="quick-btn-card" onclick="switchView('squadra')">
-            <div class="quick-btn-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-            </div>
+            <div class="quick-btn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div>
             <span class="quick-btn-label">Roster</span>
           </div>
           <div class="quick-btn-card" onclick="switchView('stagione')">
-            <div class="quick-btn-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-            </div>
+            <div class="quick-btn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
             <span class="quick-btn-label">Classifica</span>
           </div>
           <div class="quick-btn-card" onclick="switchView('news')">
-            <div class="quick-btn-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-            </div>
+            <div class="quick-btn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg></div>
             <span class="quick-btn-label">News</span>
           </div>
         </div>
       </section>
 
 
-      <!-- VISTA: STAGIONE -->
+      <!-- VISTA: STAGIONE (CON SEZIONI SCORREVOLI) -->
       <section id="view-stagione" class="view hidden">
-        <div class="season-hero-card">
-          <div class="season-hero-header">
-            <img src="public/logo.png" class="logo-image" style="width: 32px; height: 32px;" alt="U17 ePRO">
-            <div>
-              <div class="season-hero-subtitle">STAGIONE 2026/2027</div>
-              <div class="season-hero-champ">Campionato U17 Eccellenza</div>
-            </div>
-          </div>
-          
-          <h1 class="season-hero-title">U17 ECCELLENZA AP</h1>
-          <p class="season-hero-desc">Segui la nostra squadra, i nostri ragazzi; calendario, risultati, classifiche e statistiche in tempo reale.</p>
-          
-          <div class="season-hero-buttons">
-            <button class="hero-btn hero-btn-red" onclick="alert('Apertura Calendario...')">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              Calendario
-            </button>
-            <button class="hero-btn hero-btn-outline" onclick="switchView('squadra')">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-              Roster
-            </button>
-          </div>
+        <!-- Pillole di Navigazione Orizzontale -->
+        <div class="season-tabs-nav">
+          <div id="pill-calendario" class="season-tab-pill active" onclick="scrollToSlide(0)">Calendario</div>
+          <div id="pill-classifica" class="season-tab-pill" onclick="scrollToSlide(1)">Classifica</div>
+          <div id="pill-statistiche" class="season-tab-pill" onclick="scrollToSlide(2)">Statistiche di squadra</div>
         </div>
 
-        <!-- Griglia Statistiche 2x2 -->
-        <div class="stats-2x2-grid">
-          <div class="stats-grid-card" onclick="alert('Partite Giocate: 5')">
-            <div class="stats-card-header">
-              <div class="stats-card-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <!-- Carousel Orizzontale Contenitore delle 3 macro aree -->
+        <div class="season-horizontal-carousel" id="season-carousel">
+          
+          <!-- SLIDE 1: CALENDARIO -->
+          <div class="season-carousel-slide">
+            <h3 class="section-title" style="color: var(--accent-orange);">Prossime Partite</h3>
+            <div class="match-list-container">
+              <div class="match-row-card prossima">
+                <div class="match-row-header"><span>Giornata 6</span><span>In Casa • 24 Ott</span></div>
+                <div class="match-row-body">
+                  <div class="match-row-teams">AREA PRO vs Metro Ballers</div>
+                  <div class="match-row-result">--:--</div>
+                </div>
               </div>
-              <div class="stats-card-chevron">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              <div class="match-row-card prossima">
+                <div class="match-row-header"><span>Giornata 7</span><span>Trasferta • 31 Ott</span></div>
+                <div class="match-row-body">
+                  <div class="match-row-teams">CUS Torino vs AREA PRO</div>
+                  <div class="match-row-result">--:--</div>
+                </div>
               </div>
             </div>
-            <div class="stats-card-body">
-              <div class="stats-card-number">5</div>
-              <div class="stats-card-label">Partite Giocate</div>
+
+            <h3 class="section-title" style="color: #34A853; margin-top: 10px;">Partite Disputate</h3>
+            <div class="match-list-container">
+              <div class="match-row-card disputata">
+                <div class="match-row-header"><span>Giornata 5</span><span>Trasferta • 17 Ott</span></div>
+                <div class="match-row-body">
+                  <div class="match-row-teams">Pall. Moncalieri vs AREA PRO</div>
+                  <div class="match-row-result" style="color: #34A853;">65 - 74</div>
+                </div>
+              </div>
+              <div class="match-row-card disputata">
+                <div class="match-row-header"><span>Giornata 4</span><span>In Casa • 10 Ott</span></div>
+                <div class="match-row-body">
+                  <div class="match-row-teams">AREA PRO vs Collegno Basket</div>
+                  <div class="match-row-result" style="color: #34A853;">82 - 71</div>
+                </div>
+              </div>
+              <div class="match-row-card disputata" style="border-left-color: var(--accent-red);">
+                <div class="match-row-header"><span>Giornata 3</span><span>Trasferta • 03 Ott</span></div>
+                <div class="match-row-body">
+                  <div class="match-row-teams">Derthona vs AREA PRO</div>
+                  <div class="match-row-result" style="color: var(--accent-red);">78 - 69</div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="stats-grid-card" onclick="alert('Vittorie: 4')">
-            <div class="stats-card-header">
-              <div class="stats-card-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-              </div>
-              <div class="stats-card-chevron">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-              </div>
-            </div>
-            <div class="stats-card-body">
-              <div class="stats-card-number">4</div>
-              <div class="stats-card-label">Vittorie</div>
+          <!-- SLIDE 2: CLASSIFICA -->
+          <div class="season-carousel-slide">
+            <h3 class="section-title">Classifica U17 Eccellenza</h3>
+            <div class="classifica-wrapper">
+              <table class="classifica-table">
+                <thead>
+                  <tr>
+                    <th>Pos</th>
+                    <th>Squadra</th>
+                    <th style="text-align: right;">Punti</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="rank-number">1</td>
+                    <td class="team-name-cell">Derthona Basket</td>
+                    <td class="points-cell">10</td>
+                  </tr>
+                  <tr class="highlight-ap">
+                    <td class="rank-number">2</td>
+                    <td class="team-name-cell">AREA PRO</td>
+                    <td class="points-cell">8</td>
+                  </tr>
+                  <tr>
+                    <td class="rank-number">3</td>
+                    <td class="team-name-cell">Campus Piemonte</td>
+                    <td class="points-cell">8</td>
+                  </tr>
+                  <tr>
+                    <td class="rank-number">4</td>
+                    <td class="team-name-cell">CUS Torino</td>
+                    <td class="points-cell">6</td>
+                  </tr>
+                  <tr>
+                    <td class="rank-number">5</td>
+                    <td class="team-name-cell">Pall. Moncalieri</td>
+                    <td class="points-cell">4</td>
+                  </tr>
+                  <tr>
+                    <td class="rank-number">6</td>
+                    <td class="team-name-cell">Metro Ballers</td>
+                    <td class="points-cell">2</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
-          <div class="stats-grid-card" onclick="switchView('squadra')">
-            <div class="stats-card-header">
-              <div class="stats-card-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+          <!-- SLIDE 3: STATISTICHE DI SQUADRA -->
+          <div class="season-carousel-slide">
+            <h3 class="section-title">Medie di Squadra</h3>
+            
+            <div class="mini-stats-card" style="padding: 20px;">
+              <div class="mini-stats-header">
+                <span class="mini-stats-title">Attacco</span>
               </div>
-              <div class="stats-card-chevron">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-              </div>
+              <div class="mini-stats-value" style="color: var(--accent-orange);">75.8</div>
+              <div class="mini-stats-subtitle">Punti realizzati a partita (Media)</div>
             </div>
-            <div class="stats-card-body">
-              <div class="stats-card-number">10</div>
-              <div class="stats-card-label">Giocatori</div>
+
+            <div class="mini-stats-card" style="padding: 20px;">
+              <div class="mini-stats-header">
+                <span class="mini-stats-title">Difesa</span>
+              </div>
+              <div class="mini-stats-value" style="color: #4299e1;">70.6</div>
+              <div class="mini-stats-subtitle">Punti subiti a partita (Media)</div>
+            </div>
+
+            <div class="mini-stats-card" style="padding: 20px;">
+              <div class="mini-stats-header">
+                <span class="mini-stats-title">Falli di Squadra</span>
+              </div>
+              <div class="mini-stats-value">18.4</div>
+              <div class="mini-stats-subtitle">Falli commessi medi</div>
             </div>
           </div>
 
-          <div class="stats-grid-card" onclick="alert('Media Punti Squadra: 9 PTS')">
-            <div class="stats-card-header">
-              <div class="stats-card-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-              </div>
-              <div class="stats-card-chevron">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-              </div>
-            </div>
-            <div class="stats-card-body">
-              <div class="stats-card-number">9 PTS</div>
-              <div class="stats-card-label">Stat. Squadra</div>
-            </div>
-          </div>
         </div>
       </section>
 
 
-      <!-- VISTA: ROSTER / SQUADRA -->
+      <!-- VISTA: SQUADRA (ROSTER) -->
       <section id="view-squadra" class="view hidden">
         <h2 class="section-title" style="margin-bottom: 16px;">Il Roster</h2>
         <div class="roster-list">
           <div class="player-card">
-            <div class="player-left">
-              <div class="player-number">#4</div>
-              <div>
-                <div class="player-name">Andrea Lisai</div>
-                <div class="player-role">Playmaker</div>
-              </div>
-            </div>
+            <div class="player-left"><div class="player-number">#4</div><div><div class="player-name">Andrea Lisai</div><div class="player-role">Playmaker</div></div></div>
           </div>
           <div class="player-card">
-            <div class="player-left">
-              <div class="player-number">#8</div>
-              <div>
-                <div class="player-name">Marco Rossi</div>
-                <div class="player-role">Guardia</div>
-              </div>
-            </div>
+            <div class="player-left"><div class="player-number">#8</div><div><div class="player-name">Marco Rossi</div><div class="player-role">Guardia</div></div></div>
           </div>
           <div class="player-card">
-            <div class="player-left">
-              <div class="player-number">#15</div>
-              <div>
-                <div class="player-name">Luca Bianchi</div>
-                <div class="player-role">Centro</div>
-              </div>
-            </div>
+            <div class="player-left"><div class="player-number">#15</div><div><div class="player-name">Luca Bianchi</div><div class="player-role">Centro</div></div></div>
           </div>
         </div>
       </section>
@@ -1006,20 +781,11 @@
       <!-- VISTA: NEWS -->
       <section id="view-news" class="view hidden">
         <h2 class="section-title" style="margin-bottom: 16px;">Ultime Notizie</h2>
-        
         <div class="news-card">
           <div class="news-content">
             <div class="news-date">17 LUG 2026</div>
             <h3 class="news-title">U17 Eccellenza AP punta alla vetta</h3>
             <p class="news-excerpt">Dopo l'ultimo successo in trasferta, la squadra si prepara ad affrontare l'ostica sfida contro i Metro Ballers.</p>
-          </div>
-        </div>
-
-        <div class="news-card">
-          <div class="news-content">
-            <div class="news-date">10 LUG 2026</div>
-            <h3 class="news-title">Notifiche push attive nell'app</h3>
-            <p class="news-excerpt">Da oggi tutti i tifosi e giocatori possono attivare le notifiche istantanee per non perdersi alcun aggiornamento sul match.</p>
           </div>
         </div>
       </section>
@@ -1028,101 +794,49 @@
       <!-- VISTA: LOGIN / REGISTRAZIONE -->
       <section id="view-login" class="view hidden">
         <div class="login-container">
-          
           <div class="login-top-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
           </div>
 
-          <!-- Box d'Accesso (Accedi) -->
+          <!-- Login -->
           <div id="auth-login-box" style="width:100%;">
-            <h1 class="login-title">Bentornato nell'App dell' U17 Eccellenza AP</h1>
+            <h1 class="login-title">Bentornato nell'App</h1>
             <p class="login-subtitle" style="text-align: center;">Accedi al tuo account</p>
-
             <div class="login-card">
-              <button class="google-btn-dark" onclick="handleGoogleSuccess('Accesso')">
-                <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              <button class="google-btn-dark" onclick="handleGoogleSuccess(false)">
                 Continua con Google
               </button>
-
               <div class="or-divider">OPPURE</div>
-
               <form onsubmit="handleLoginSuccess(event)">
-                <div class="input-label-row">
-                  <span class="input-label">Email</span>
-                </div>
-                <div class="input-wrapper">
-                  <div class="input-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                  </div>
-                  <input type="email" id="login-email" class="custom-input" placeholder="you@example.com" required />
-                </div>
-
-                <div class="input-label-row">
-                  <span class="input-label">Password</span>
-                  <a href="#" class="forgot-pass-link" onclick="alert('Funzione di recupero password in sviluppo!')">Password dimenticata?</a>
-                </div>
-                <div class="input-wrapper">
-                  <div class="input-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                  </div>
-                  <input type="password" class="custom-input" placeholder="••••••••" required />
-                </div>
-
+                <div class="input-label-row"><span class="input-label">Email</span></div>
+                <div class="input-wrapper"><input type="email" id="login-email" class="custom-input" placeholder="you@example.com" required /></div>
+                <div class="input-label-row"><span class="input-label">Password</span></div>
+                <div class="input-wrapper"><input type="password" class="custom-input" placeholder="••••••••" required /></div>
                 <button type="submit" class="submit-btn-red">Accedi</button>
               </form>
             </div>
-
             <div class="auth-bottom-switch">Non hai un account? <span onclick="toggleAuthMode(true)">Registrati</span></div>
           </div>
 
-          <!-- Box Registrazione (Registrati) -->
+          <!-- Registrazione -->
           <div id="auth-register-box" class="hidden" style="width:100%;">
-            <h1 class="login-title">Crea un nuovo Profilo</h1>
+            <h1 class="login-title">Crea un Profilo</h1>
             <p class="login-subtitle" style="text-align: center;">Iscriviti a U17 Area Pro</p>
-
             <div class="login-card">
-              <button class="google-btn-dark" onclick="handleGoogleSuccess('Registrazione')">
-                <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              <button class="google-btn-dark" onclick="handleGoogleSuccess(true)">
                 Registrati con Google
               </button>
-
               <div class="or-divider">OPPURE</div>
-
               <form onsubmit="handleRegistration(event)">
-                <div class="input-label-row">
-                  <span class="input-label">Email</span>
-                </div>
-                <div class="input-wrapper">
-                  <div class="input-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                  </div>
-                  <input type="email" id="register-email" class="custom-input" placeholder="you@example.com" required />
-                </div>
-
-                <div class="input-label-row">
-                  <span class="input-label">Password</span>
-                </div>
-                <div class="input-wrapper">
-                  <div class="input-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                  </div>
-                  <input type="password" class="custom-input" placeholder="••••••••" required />
-                </div>
-
-                <div class="push-notification-opt">
-                  <input type="checkbox" id="allow-push-notifications" checked />
-                  <label for="allow-push-notifications">
-                    Desidero ricevere le notifiche push native di sistema su questo smartphone per risultati, variazioni e notizie in tempo reale.
-                  </label>
-                </div>
-
+                <div class="input-label-row"><span class="input-label">Email</span></div>
+                <div class="input-wrapper"><input type="email" id="register-email" class="custom-input" placeholder="you@example.com" required /></div>
+                <div class="input-label-row"><span class="input-label">Password</span></div>
+                <div class="input-wrapper"><input type="password" class="custom-input" placeholder="••••••••" required /></div>
                 <button type="submit" class="submit-btn-red">Registrati</button>
               </form>
             </div>
-
             <div class="auth-bottom-switch">Hai già un account? <span onclick="toggleAuthMode(false)">Accedi</span></div>
           </div>
-
         </div>
       </section>
 
@@ -1131,27 +845,19 @@
     <!-- Navigation Bottom Bar -->
     <nav class="bottom-nav-bar">
       <div id="nav-home" class="nav-tab-item active" onclick="switchView('home')">
-        <div class="tab-icon-wrapper">
-          <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        </div>
+        <div class="tab-icon-wrapper"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div>
         <span>Home</span>
       </div>
       <div id="nav-stagione" class="nav-tab-item" onclick="switchView('stagione')">
-        <div class="tab-icon-wrapper">
-          <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
-        </div>
+        <div class="tab-icon-wrapper"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg></div>
         <span>Stagione</span>
       </div>
       <div id="nav-squadra" class="nav-tab-item" onclick="switchView('squadra')">
-        <div class="tab-icon-wrapper">
-          <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-        </div>
+        <div class="tab-icon-wrapper"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
         <span>Squadra</span>
       </div>
       <div id="nav-news" class="nav-tab-item" onclick="switchView('news')">
-        <div class="tab-icon-wrapper">
-          <svg viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-1 12H5V9h14v8z"/></svg>
-        </div>
+        <div class="tab-icon-wrapper"><svg viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-1 12H5V9h14v8z"/></svg></div>
         <span>News</span>
       </div>
     </nav>
@@ -1159,30 +865,51 @@
   </div>
 
   <script>
-    // Gestione navigazione
+    // Cambio viste principali dell'applicazione
     function switchView(viewId) {
-      document.querySelectorAll('.view').forEach(view => {
-        view.classList.add('hidden');
-      });
-
-      document.querySelectorAll('.nav-tab-item').forEach(item => {
-        item.classList.remove('active');
-      });
+      document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
+      document.querySelectorAll('.nav-tab-item').forEach(item => item.classList.remove('active'));
 
       const targetView = document.getElementById(`view-${viewId}`);
-      if (targetView) {
-        targetView.classList.remove('hidden');
-      }
+      if (targetView) targetView.classList.remove('hidden');
 
       const targetNav = document.getElementById(`nav-${viewId}`);
-      if (targetNav) {
-        targetNav.classList.add('active');
-      }
+      if (targetNav) targetNav.classList.add('active');
 
       window.scrollTo(0, 0);
     }
 
-    // Cambia tra Login e Registrazione
+    /* GESTIONE SEZIONI ORIZZONTALI (PAGINA STAGIONE) */
+    const carousel = document.getElementById('season-carousel');
+    const pills = ['pill-calendario', 'pill-classifica', 'pill-statistiche'];
+
+    function scrollToSlide(slideIndex) {
+      if (!carousel) return;
+      const slideWidth = carousel.offsetWidth;
+      carousel.scrollTo({
+        left: slideWidth * slideIndex,
+        behavior: 'smooth'
+      });
+      setActivePill(slideIndex);
+    }
+
+    function setActivePill(index) {
+      pills.forEach(id => document.getElementById(id).classList.remove('active'));
+      if (pills[index]) {
+        document.getElementById(pills[index]).classList.add('active');
+      }
+    }
+
+    // Ascolto dello scorrimento manuale (Swipe) per sincronizzare le pillole superiori
+    if (carousel) {
+      carousel.addEventListener('scroll', () => {
+        const slideWidth = carousel.offsetWidth;
+        const index = Math.round(carousel.scrollLeft / slideWidth);
+        setActivePill(index);
+      });
+    }
+
+    // Cambia interfaccia d'accesso tra Accedi e Registrati
     function toggleAuthMode(isRegister) {
       if (isRegister) {
         document.getElementById('auth-login-box').classList.add('hidden');
@@ -1193,79 +920,54 @@
       }
     }
 
-    // Richiesta permessi nativi Notifiche Push
-    function requestPushPermission(callback) {
-      if (!('Notification' in window)) {
-        if (callback) callback();
-        return;
+    /* LOGICA DINAMICA BENVENUTO / BENTORNATO */
+    function applyUserProfile(email, isFirstTimeRegistration) {
+      const displayEmail = email || "utente@esempio.it";
+      let userName = displayEmail.split('@')[0];
+      
+      // Pulizia nome per renderlo leggibile
+      userName = userName.replace(/[._]/g, ' ');
+      userName = userName.charAt(0).toUpperCase() + userName.slice(1);
+
+      // Aggiornamento selettivo della stringa di intestazione
+      const headingContainer = document.getElementById('main-welcome-heading');
+      if (isFirstTimeRegistration) {
+        headingContainer.innerHTML = `Benvenuto <span>${userName}</span> nell'app ufficiale dell'U17 Eccellenza di Area Pro`;
+      } else {
+        headingContainer.innerHTML = `Bentornato <span>${userName}</span> nell'app ufficiale dell'U17 Eccellenza di Area Pro`;
       }
-
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          console.log('Notifiche Push attivate.');
-        }
-        if (callback) callback();
-      });
-    }
-
-    // Aggiornamento dinamico del profilo e del benvenuto nella Home
-    function applyUserProfile(email) {
-      const displayEmail = email || "andrea.lisai@example.com";
-      const userName = displayEmail.split('@')[0];
       
-      const finalName = userName.toLowerCase() === 'you' || userName.includes('example') ? 'Andrea Lisai' : userName;
-      
-      // Aggiorna il testo di benvenuto sulla Home Page
-      document.getElementById('username-display').innerText = finalName;
-      
-      // Aggiorna l'avatar nella barra in alto a destra
-      const initials = finalName.split(' ').map(n => n[0]).join('').toUpperCase();
-      const profileBtn = document.getElementById('header-profile-btn');
-      
-      profileBtn.innerHTML = `
-        <div class="user-avatar-circle">
-          ${initials}
-        </div>
+      // Avatar ad icona con le iniziali in alto a destra
+      const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+      document.getElementById('header-profile-btn').innerHTML = `
+        <div class="user-avatar-circle">${initials}</div>
       `;
     }
 
-    // Login
+    // Azione Login (Bentornato)
     function handleLoginSuccess(event) {
       event.preventDefault();
       const emailVal = document.getElementById('login-email').value;
-      applyUserProfile(emailVal);
-      alert('Accesso completato!');
+      applyUserProfile(emailVal, false); // false = Bentornato
+      alert('Accesso effettuato con successo!');
       switchView('home');
     }
 
-    // Registrazione
+    // Azione Registrazione (Benvenuto)
     function handleRegistration(event) {
       event.preventDefault();
       const emailVal = document.getElementById('register-email').value;
-      const pushCheckbox = document.getElementById('allow-push-notifications');
-
-      if (pushCheckbox && pushCheckbox.checked) {
-        requestPushPermission(() => {
-          applyUserProfile(emailVal);
-          alert('Registrazione completata!');
-          toggleAuthMode(false);
-          switchView('home');
-        });
-      } else {
-        applyUserProfile(emailVal);
-        alert('Registrazione completata!');
-        toggleAuthMode(false);
-        switchView('home');
-      }
+      applyUserProfile(emailVal, true); // true = Benvenuto
+      alert('Registrazione completata!');
+      toggleAuthMode(false);
+      switchView('home');
     }
 
-    // Login Google
-    function handleGoogleSuccess(actionType) {
-      requestPushPermission(() => {
-        applyUserProfile("Andrea Lisai");
-        alert(`${actionType} completato!`);
-        switchView('home');
-      });
+    // Accesso rapido Google integrato (Riconosce l'intenzione dalla schermata di provenienza)
+    function handleGoogleSuccess(isRegistrationFlow) {
+      applyUserProfile("Andrea Lisai", isRegistrationFlow);
+      alert('Autenticazione Google riuscita!');
+      switchView('home');
     }
   </script>
 
