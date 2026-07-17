@@ -664,6 +664,27 @@
   </style>
 </head>
 <body>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script>
+  // CONFIGURAZIONE (Inserisci qui i tuoi dati da Firebase Console)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCNn9yVzGopJrjQcevac-UsOp4TAMz8Y6E",
+    authDomain: "epro-web.firebaseapp.com",
+    projectId: "epro-web",
+    storageBucket: "epro-web.firebasestorage.app",
+    messagingSenderId: "360243781432",
+    appId: "1:360243781432:web:c2a70f3ef45df0c9d96bcd"
+  };
+
+  // Inizializzazione
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+</script>
 
   <div class="app-viewport">
 
