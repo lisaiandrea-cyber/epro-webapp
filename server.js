@@ -1,53 +1,54 @@
-require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const cors = require('cors');
 const multer = require('multer');
-const admin = require('firebase-admin');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, 'data.json');
 
-// 1. INIZIALIZZAZIONE FIREBASE ADMIN
-// Usa le variabili d'ambiente per proteggere le chiavi segrete su Render
-try {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      // Risolve il problema dei ritorni a capo (\n) nella chiave privata di Firebase
-      privateKey: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined,
-    })
-  });
-  console.log("Firebase Admin inizializzato correttamente.");
-} catch (error) {
-  console.error("Errore inizializzazione Firebase Admin. Controlla le variabili .env:", error.message);
-}
-
-// Middleware
+// Configurazione Middleware
+app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Database dei token per le notifiche push (salvato in memoria per semplicità)
-let pushTokens = [];
+// ==========================================
+// 1. INIZIALIZZAZIONE SUPABASE (con fallback)
+// ==========================================
+let supabase = null;
+const useSupabase = process.env.SUPABASE_URL && process.env.SUPABASE_KEY;
 
-// Helper per leggere/scrivere il file data.json
-const readData = () => {
-  if (!fs.existsSync(DATA_FILE)) {
-    // Dati di default se il file non esiste
-    const defaultData = { themeColor: '#E61E2B', matches: [], news: [], roster: [], standings: [], stats: [] };
-    fs.writeFileSync(DATA_FILE, JSON.stringify(defaultData, null, 2));
-    return defaultData;
+if (useSupabase) {
+  supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+  console.log('🔌 Connesso con successo a Supabase Database!');
+} else {
+  console.warn('⚠️ Attenzione: Variabili Supabase mancanti. Il server utilizzerà il file JSON locale (data.json).');
+}
+
+// Configurazione file locale di fallback (se Supabase non è configurato)
+const LOCAL_DATA_FILE = path.join(__dirname, 'data.json');
+
+// Helper per leggere il file locale se Supabase è disattivato
+function readLocalData() {
+  if (!fs.existsSync(LOCAL_DATA_FILE)) {
+    const defaultStructure = { matches: [], news: [], roster: [], standings: [], stats: [] };
+    fs.writeFileSync(LOCAL_DATA_FILE, JSON.stringify(defaultStructure, null, 2));
+    return defaultStructure;
   }
-  return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-};
+  return JSON.parse(fs.readFileSync(LOCAL_DATA_FILE, 'utf-8'));
+}
 
-const writeData = (data) => {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
-};
+// Helper per scrivere sul file locale di fallback
+function writeLocalData(data) {
+  fs.writeFileSync(LOCAL_DATA_FILE, JSON.stringify(data, null, 2));
+}
 
-// Configurazione Caricamento Immagini (Multer)
+// ==========================================
+// 2. GESTIONE IMMAGINI (MULTER)
+// ==========================================
+// Configura la cartella di destinazione delle immagini caricate
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = path.join(__dirname, 'public', 'uploads');
@@ -61,181 +62,241 @@ const storage = multer.diskStorage({
     cb(null, uniqueSuffix + path.extname(file.originalname));
   }
 });
-const upload = multer({ storage });
+const upload = multer({ storage: storage });
 
-// ================= API ROTTE UTENTI & DATI =================
-
-// Ottieni tutti i dati pubblici dell'app
-app.get('/api/data', (req, res) => {
-  res.json(readData());
-});
-
-// Middleware per verificare se l'utente è autenticato tramite Firebase
-async function verifyToken(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Accesso non autorizzato. Token mancante.' });
-  }
-  const token = authHeader.split(' ')[1];
-  try {
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    req.user = decodedToken;
-    next();
-  } catch (error) {
-    res.status(403).json({ error: 'Token non valido o scaduto.' });
+// ==========================================
+// 3. FUNZIONI HELPER PER IL RECUPERO DATI
+// ==========================================
+async function getAllData() {
+  if (useSupabase) {
+    try {
+      const [matches, news, roster, standings, stats] = await Promise.all([
+        supabase.from('matches').select('*').order('id', { ascending: true }),
+        supabase.from('news').select('*').order('id', { ascending: false }),
+        supabase.from('roster').select('*').order('id', { ascending: true }),
+        supabase.from('standings').select('*').order('points', { ascending: false }),
+        supabase.from('stats').select('*').order('totalPoints', { ascending: false })
+      ]);
+      
+      return {
+        matches: matches.data || [],
+        news: news.data || [],
+        roster: roster.data || [],
+        standings: standings.data || [],
+        stats: stats.data || []
+      };
+    } catch (err) {
+      console.error('Errore nel caricamento dei dati da Supabase:', err);
+      return readLocalData(); // Fallback d'emergenza
+    }
+  } else {
+    return readLocalData();
   }
 }
 
-// Verifica lo stato dell'utente e se è l'Admin
-app.get('/api/auth/verify', verifyToken, (req, res) => {
-  // Definisci qui l'email dell'amministratore principale dell'app
-  const adminEmail = "admin@epro.com"; 
-  const isAdmin = req.user.email === adminEmail;
-  
-  res.json({
-    email: req.user.email,
-    isAdmin: isAdmin,
-    notifications: true
-  });
+// ==========================================
+// 4. API ENDPOINTS (GET ALL)
+// ==========================================
+app.get('/api/data', async (req, res) => {
+  try {
+    const data = await getAllData();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Impossibile caricare i dati' });
+  }
 });
 
-// Registra un dispositivo per ricevere le notifiche push (Token FCM)
-app.post('/api/user/subscribe', verifyToken, (req, res) => {
-  const { pushToken } = req.body;
-  if (pushToken && !pushTokens.includes(pushToken)) {
-    pushTokens.push(pushToken);
-    console.log(`Nuovo dispositivo registrato per le notifiche. Totale: ${pushTokens.length}`);
+// ==========================================
+// 5. ENDPOINTS PARTITE (MATCHES)
+// ==========================================
+app.post('/api/admin/match', async (req, res) => {
+  const newMatch = req.body;
+  if (useSupabase) {
+    const { error } = await supabase.from('matches').insert([newMatch]);
+    if (error) return res.status(500).json({ success: false, error: error.message });
+  } else {
+    const data = readLocalData();
+    newMatch.id = Date.now();
+    data.matches.push(newMatch);
+    writeLocalData(data);
   }
-  res.json({ success: true });
+  const updatedData = await getAllData();
+  res.json({ success: true, matches: updatedData.matches });
 });
 
-// Funzione Helper per inviare notifiche push a tutti i dispositivi registrati
-function sendPushNotification(title, body) {
-  if (pushTokens.length === 0) {
-    console.log("Nessun dispositivo registrato. Notifica non inviata.");
-    return;
+app.delete('/api/admin/match/:id', async (req, res) => {
+  const { id } = req.params;
+  if (useSupabase) {
+    const { error } = await supabase.from('matches').delete().eq('id', id);
+    if (error) return res.status(500).json({ success: false, error: error.message });
+  } else {
+    const data = readLocalData();
+    data.matches = data.matches.filter(m => m.id != id);
+    writeLocalData(data);
   }
+  const updatedData = await getAllData();
+  res.json({ success: true, matches: updatedData.matches });
+});
 
-  const message = {
-    notification: { title, body },
-    tokens: pushTokens,
+// ==========================================
+// 6. ENDPOINTS NOTIZIE (NEWS)
+// ==========================================
+app.post('/api/admin/news', upload.single('image'), async (req, res) => {
+  const newArticle = {
+    title: req.body.title,
+    content: req.body.content,
+    tag: req.body.tag,
+    date: req.body.date || new Date().toISOString().split('T')[0],
+    imageUrl: req.file ? `/uploads/${req.file.filename}` : req.body.imageUrl || ''
   };
 
-  admin.messaging().sendEachForMulticast(message)
-    .then((response) => {
-      console.log(`Notifica inviata con successo a ${response.successCount} dispositivi.`);
-    })
-    .catch((error) => {
-      console.error("Errore nell'invio delle notifiche push:", error);
-    });
-}
-
-// ================= API PANNELLO ADMIN (Scrittura) =================
-
-// Aggiorna Colore Tema
-app.post('/api/admin/theme', (req, res) => {
-  const { color } = req.body;
-  const db = readData();
-  db.themeColor = color;
-  writeData(db);
-  res.json({ success: true });
-});
-
-// Aggiungi Partita (Invia notifica automatica se terminata)
-app.post('/api/admin/match', (req, res) => {
-  const db = readData();
-  const newMatch = { id: Date.now(), ...req.body };
-  db.matches.push(newMatch);
-  writeData(db);
-
-  if (newMatch.status === 'Terminata') {
-    sendPushNotification(
-      'Risultato Finale! 🏀', 
-      `U17 ePRO contro ${newMatch.opponent}. Punteggio: ${newMatch.score}`
-    );
+  if (useSupabase) {
+    const { error } = await supabase.from('news').insert([newArticle]);
+    if (error) return res.status(500).json({ success: false, error: error.message });
   } else {
-    sendPushNotification(
-      'Nuova partita in programma! 🗓️',
-      `Saremo in campo contro ${newMatch.opponent} il ${newMatch.date} alle ore ${newMatch.time}`
-    );
+    const data = readLocalData();
+    newArticle.id = Date.now();
+    data.news.push(newArticle);
+    writeLocalData(data);
   }
-
-  res.json({ success: true, matches: db.matches });
+  const updatedData = await getAllData();
+  res.json({ success: true, news: updatedData.news });
 });
 
-// Aggiungi Notizia (Invia notifica automatica)
-app.post('/api/admin/news', (req, res) => {
-  const db = readData();
-  const newNews = { id: Date.now(), date: new Date().toLocaleDateString('it-IT'), ...req.body };
-  db.news.unshift(newNews); // Metti l'ultima notizia in cima
-  writeData(db);
-
-  sendPushNotification(
-    'Nuovo comunicato ePRO! 📢', 
-    newNews.title
-  );
-
-  res.json({ success: true, news: db.news });
+app.delete('/api/admin/news/:id', async (req, res) => {
+  const { id } = req.params;
+  if (useSupabase) {
+    const { error } = await supabase.from('news').delete().eq('id', id);
+    if (error) return res.status(500).json({ success: false, error: error.message });
+  } else {
+    const data = readLocalData();
+    data.news = data.news.filter(n => n.id != id);
+    writeLocalData(data);
+  }
+  const updatedData = await getAllData();
+  res.json({ success: true, news: updatedData.news });
 });
 
-// Caricamento Immagine Roster/News
-app.post('/api/admin/upload', upload.single('image'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'Nessun file caricato' });
-  res.json({ imageUrl: `/uploads/${req.file.filename}` });
+// ==========================================
+// 7. ENDPOINTS ROSTER (GIOCATORI)
+// ==========================================
+app.post('/api/admin/roster', upload.single('image'), async (req, res) => {
+  const newPlayer = {
+    name: req.body.name,
+    role: req.body.role,
+    number: req.body.number,
+    category: req.body.category,
+    imageUrl: req.file ? `/uploads/${req.file.filename}` : req.body.imageUrl || ''
+  };
+
+  if (useSupabase) {
+    const { error } = await supabase.from('roster').insert([newPlayer]);
+    if (error) return res.status(500).json({ success: false, error: error.message });
+  } else {
+    const data = readLocalData();
+    newPlayer.id = Date.now();
+    data.roster.push(newPlayer);
+    writeLocalData(data);
+  }
+  const updatedData = await getAllData();
+  res.json({ success: true, roster: updatedData.roster });
 });
 
-// Aggiungi al Roster
-app.post('/api/admin/roster', (req, res) => {
-  const db = readData();
-  const newMember = { id: Date.now(), ...req.body };
-  db.roster.push(newMember);
-  writeData(db);
-  res.json({ success: true, roster: db.roster });
+app.delete('/api/admin/roster/:id', async (req, res) => {
+  const { id } = req.params;
+  if (useSupabase) {
+    const { error } = await supabase.from('roster').delete().eq('id', id);
+    if (error) return res.status(500).json({ success: false, error: error.message });
+  } else {
+    const data = readLocalData();
+    data.roster = data.roster.filter(p => p.id != id);
+    writeLocalData(data);
+  }
+  const updatedData = await getAllData();
+  res.json({ success: true, roster: updatedData.roster });
 });
 
-// Rimuovi dal Roster
-app.delete('/api/admin/roster/:id', (req, res) => {
-  const db = readData();
-  db.roster = db.roster.filter(r => r.id != req.params.id);
-  writeData(db);
-  res.json({ success: true, roster: db.roster });
+// ==========================================
+// 8. ENDPOINTS CLASSIFICA (STANDINGS)
+// ==========================================
+app.post('/api/admin/standings', async (req, res) => {
+  const newStanding = {
+    team: req.body.team,
+    points: parseInt(req.body.points) || 0
+  };
+
+  if (useSupabase) {
+    const { error } = await supabase.from('standings').insert([newStanding]);
+    if (error) return res.status(500).json({ success: false, error: error.message });
+  } else {
+    const data = readLocalData();
+    newStanding.id = Date.now();
+    data.standings.push(newStanding);
+    writeLocalData(data);
+  }
+  const updatedData = await getAllData();
+  res.json({ success: true, standings: updatedData.standings });
 });
 
-// Aggiungi Squadra in Classifica
-app.post('/api/admin/standings', (req, res) => {
-  const db = readData();
-  const newTeam = { id: Date.now(), ...req.body };
-  db.standings.push(newTeam);
-  writeData(db);
-  res.json({ success: true, standings: db.standings });
+app.delete('/api/admin/standings/:id', async (req, res) => {
+  const { id } = req.params;
+  if (useSupabase) {
+    const { error } = await supabase.from('standings').delete().eq('id', id);
+    if (error) return res.status(500).json({ success: false, error: error.message });
+  } else {
+    const data = readLocalData();
+    data.standings = data.standings.filter(s => s.id != id);
+    writeLocalData(data);
+  }
+  const updatedData = await getAllData();
+  res.json({ success: true, standings: updatedData.standings });
 });
 
-// Rimuovi Squadra dalla Classifica
-app.delete('/api/admin/standings/:id', (req, res) => {
-  const db = readData();
-  db.standings = db.standings.filter(s => s.id != req.params.id);
-  writeData(db);
-  res.json({ success: true, standings: db.standings });
+// ==========================================
+// 9. ENDPOINTS STATISTICHE (STATS)
+// ==========================================
+app.post('/api/admin/stats', async (req, res) => {
+  const newStat = {
+    name: req.body.name,
+    games: parseInt(req.body.games) || 0,
+    totalPoints: parseInt(req.body.totalPoints) || 0
+  };
+
+  if (useSupabase) {
+    const { error } = await supabase.from('stats').insert([newStat]);
+    if (error) return res.status(500).json({ success: false, error: error.message });
+  } else {
+    const data = readLocalData();
+    newStat.id = Date.now();
+    data.stats.push(newStat);
+    writeLocalData(data);
+  }
+  const updatedData = await getAllData();
+  res.json({ success: true, stats: updatedData.stats });
 });
 
-// Salva Statistica Giocatore
-app.post('/api/admin/stats', (req, res) => {
-  const db = readData();
-  const newStat = { id: Date.now(), ...req.body };
-  db.stats.push(newStat);
-  writeData(db);
-  res.json({ success: true, stats: db.stats });
+app.delete('/api/admin/stats/:id', async (req, res) => {
+  const { id } = req.params;
+  if (useSupabase) {
+    const { error } = await supabase.from('stats').delete().eq('id', id);
+    if (error) return res.status(500).json({ success: false, error: error.message });
+  } else {
+    const data = readLocalData();
+    data.stats = data.stats.filter(s => s.id != id);
+    writeLocalData(data);
+  }
+  const updatedData = await getAllData();
+  res.json({ success: true, stats: updatedData.stats });
 });
 
-// Rimuovi Statistica Giocatore
-app.delete('/api/admin/stats/:id', (req, res) => {
-  const db = readData();
-  db.stats = db.stats.filter(s => s.id != req.params.id);
-  writeData(db);
-  res.json({ success: true, stats: db.stats });
+// ==========================================
+// 10. ROTTE FRONTEND GENERALI
+// ==========================================
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Avvia il server
+// Avvio Server
 app.listen(PORT, () => {
-  console.log(`Server attivo sulla porta http://localhost:${PORT}`);
+  console.log(`🚀 Server in esecuzione sulla porta ${PORT}`);
 });
