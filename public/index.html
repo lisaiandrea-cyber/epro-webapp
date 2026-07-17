@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>U17 ECC AP</title>
+  <title>U17 ePRO</title>
 
   <!-- Google Fonts per un look Premium e Moderno -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <style>
-    /* Reset & Variabili di design basate sulle immagini */
+    /* Reset & Variabili di design */
     :root {
       --bg-dark: #0a111e;
       --bg-card: #121e33;
@@ -56,7 +56,7 @@
       position: relative;
     }
 
-    /* Global Header */
+    /* Header dell'App */
     .app-header {
       padding: 16px;
       display: flex;
@@ -68,31 +68,50 @@
     .header-logo-section {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      cursor: pointer;
     }
 
-    .logo-badge-round {
+    /* Icona ripristinata con immagine della cartella public */
+    .logo-image {
       width: 40px;
       height: 40px;
-      background: radial-gradient(circle, #e52d27, #121e33);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 8px;
-      text-align: center;
-      border: 1px solid rgba(255,255,255,0.2);
+      object-fit: contain;
     }
 
     .header-title {
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 18px;
+      font-weight: 800;
       letter-spacing: 0.5px;
     }
 
-    .hamburger-icon {
+    /* Icona profilo utente in alto a destra */
+    .header-profile-btn {
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+
+    .header-profile-btn:hover {
+      color: var(--text-white);
+    }
+
+    .user-avatar-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e2c42, #121e33);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--accent-orange);
+      font-weight: 700;
+      color: var(--text-white);
     }
 
     /* Viste */
@@ -112,12 +131,189 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* Titolo di benvenuto personalizzato */
+    .big-welcome-title {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.4;
+      margin-top: 8px;
+      margin-bottom: 24px;
+    }
+
+    .big-welcome-title span {
+      color: var(--accent-orange);
+    }
+
+    /* Grid record e posizione */
+    .stats-row-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .mini-stats-card {
+      background-color: var(--bg-card);
+      border-radius: 18px;
+      padding: 16px;
+      position: relative;
+    }
+
+    .mini-stats-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .mini-stats-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .mini-stats-icon-bg {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mini-stats-value {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .mini-stats-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Prossima partita */
+    .section-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .section-link-orange {
+      color: var(--accent-orange);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .next-match-card {
+      background-color: var(--bg-card);
+      border-radius: 20px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .home-tag-badge {
+      display: inline-block;
+      background-color: rgba(255, 140, 66, 0.15);
+      color: var(--accent-orange);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .match-versus-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .match-info-meta-row {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      position: relative;
+      z-index: 2;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meta-item-orange {
+      color: var(--accent-orange);
+      font-weight: 600;
+    }
+
+    /* Watermark pallone basket */
+    .basketball-watermark {
+      position: absolute;
+      right: -20px;
+      bottom: -20px;
+      width: 140px;
+      height: 140px;
+      opacity: 0.1;
+      color: var(--text-white);
+      pointer-events: none;
+    }
+
+    /* Accesso rapido */
+    .quick-access-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .quick-btn-card {
+      background-color: var(--bg-card);
+      border-radius: 16px;
+      padding: 16px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .quick-btn-card:active {
+      transform: scale(0.95);
+    }
+
+    .quick-btn-icon {
+      color: var(--accent-orange);
+    }
+
+    .quick-btn-label {
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+
     /* --- VISTA LOGIN/REGISTRAZIONE --- */
     .login-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding-top: 30px;
+      padding-top: 10px;
     }
 
     .login-top-icon {
@@ -280,7 +476,6 @@
       cursor: pointer;
     }
 
-    /* Checkbox per notifiche push nello stile dark */
     .push-notification-opt {
       display: flex;
       align-items: flex-start;
@@ -302,219 +497,6 @@
       color: var(--text-muted);
       line-height: 1.4;
       cursor: pointer;
-    }
-
-
-    /* --- VISTA HOME (DASHBOARD) --- */
-    .home-user-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-
-    .user-profile-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .user-avatar-circle {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #1e2c42, #121e33);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid var(--border-color);
-      font-weight: bold;
-      color: var(--text-white);
-    }
-
-    .user-meta-text {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .user-name-text {
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .big-welcome-title {
-      font-size: 28px;
-      font-weight: 800;
-      line-height: 1.2;
-      margin-bottom: 24px;
-    }
-
-    .big-welcome-title span {
-      display: block;
-      color: var(--accent-orange);
-    }
-
-    /* Grid record e posizione */
-    .stats-row-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .mini-stats-card {
-      background-color: var(--bg-card);
-      border-radius: 18px;
-      padding: 16px;
-      position: relative;
-    }
-
-    .mini-stats-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .mini-stats-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .mini-stats-icon-bg {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .mini-stats-value {
-      font-size: 28px;
-      font-weight: 800;
-    }
-
-    .mini-stats-subtitle {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    /* Prossima partita */
-    .section-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .section-title {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .section-link-orange {
-      color: var(--accent-orange);
-      font-size: 14px;
-      font-weight: 600;
-      text-decoration: none;
-    }
-
-    .next-match-card {
-      background-color: var(--bg-card);
-      border-radius: 20px;
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
-      margin-bottom: 24px;
-    }
-
-    .home-tag-badge {
-      display: inline-block;
-      background-color: rgba(255, 140, 66, 0.15);
-      color: var(--accent-orange);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-
-    .match-versus-title {
-      font-size: 20px;
-      font-weight: 800;
-      margin-bottom: 20px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .match-info-meta-row {
-      display: flex;
-      gap: 16px;
-      font-size: 13px;
-      color: var(--text-muted);
-      position: relative;
-      z-index: 2;
-    }
-
-    .meta-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .meta-item-orange {
-      color: var(--accent-orange);
-      font-weight: 600;
-    }
-
-    /* Watermark pallone basket in background */
-    .basketball-watermark {
-      position: absolute;
-      right: -20px;
-      bottom: -20px;
-      width: 140px;
-      height: 140px;
-      opacity: 0.1;
-      color: var(--text-white);
-      pointer-events: none;
-    }
-
-    /* Accesso rapido */
-    .quick-access-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .quick-btn-card {
-      background-color: var(--bg-card);
-      border-radius: 16px;
-      padding: 16px 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      cursor: pointer;
-      text-align: center;
-      transition: transform 0.2s;
-    }
-
-    .quick-btn-card:active {
-      transform: scale(0.95);
-    }
-
-    .quick-btn-icon {
-      color: var(--accent-orange);
-    }
-
-    .quick-btn-label {
-      font-size: 11px;
-      font-weight: 700;
     }
 
 
@@ -739,7 +721,6 @@
       z-index: 1000;
     }
 
-    /* Forza il posizionamento all'interno della viewport se simulata */
     @media (min-width: 480px) {
       .bottom-nav-bar {
         max-width: 480px;
@@ -771,7 +752,6 @@
       fill: currentColor;
     }
 
-    /* Tab Attiva con Gradiente Esatto (Pillola come Immagine 2) */
     .nav-tab-item.active {
       color: var(--text-white);
     }
@@ -799,14 +779,13 @@
     <!-- App Header -->
     <header class="app-header">
       <div class="header-logo-section" onclick="switchView('home')">
-        <div class="logo-badge-round">
-          U17<br>ECC
-        </div>
-        <span class="header-title">U17 ECC AP</span>
+        <!-- Icona ripristinata dall'immagine presente nella cartella public -->
+        <img src="public/logo.png" class="logo-image" alt="Logo U17 ePRO">
+        <span class="header-title">U17 ePRO</span>
       </div>
-      <div class="hamburger-icon" onclick="switchView('login')">
-        <!-- Icona profilo utente generica -->
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      <!-- Icona in alto a destra per l'accesso profilo utente (unico punto di login/logout) -->
+      <div class="header-profile-btn" id="header-profile-btn" onclick="switchView('login')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
       </div>
     </header>
 
@@ -815,20 +794,10 @@
 
       <!-- VISTA: HOME (DASHBOARD) -->
       <section id="view-home" class="view">
-        <div class="home-user-bar">
-          <div class="user-profile-info">
-            <div id="user-avatar" class="user-avatar-circle">OS</div>
-            <div>
-              <div class="user-meta-text">Bentornato,</div>
-              <div id="user-fullname" class="user-name-text">Ospite</div>
-            </div>
-          </div>
-          <div class="user-avatar-circle" style="width: 36px; height: 36px; font-size: 11px; cursor: pointer;" onclick="switchView('login')">
-            Accedi
-          </div>
-        </div>
-
-        <h1 class="big-welcome-title">Benvenuti su<br><span>U17 Area Pro</span></h1>
+        <!-- Titolo di benvenuto con layout pulito e dinamico -->
+        <h1 class="big-welcome-title">
+          Benvenuto/Bentornato <span id="username-display">Ospite</span> nell'app ufficiale dell'U17 Eccellenza di Area Pro
+        </h1>
 
         <!-- Record e Posizione Grid -->
         <div class="stats-row-grid">
@@ -912,7 +881,7 @@
       <section id="view-stagione" class="view hidden">
         <div class="season-hero-card">
           <div class="season-hero-header">
-            <div class="logo-badge-round" style="width: 32px; height: 32px; font-size: 7px;">U17<br>ECC</div>
+            <img src="public/logo.png" class="logo-image" style="width: 32px; height: 32px;" alt="U17 ePRO">
             <div>
               <div class="season-hero-subtitle">STAGIONE 2026/2027</div>
               <div class="season-hero-champ">Campionato U17 Eccellenza</div>
@@ -1060,7 +1029,6 @@
       <section id="view-login" class="view hidden">
         <div class="login-container">
           
-          <!-- Icona rossa con login -->
           <div class="login-top-icon">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
           </div>
@@ -1141,7 +1109,6 @@
                   <input type="password" class="custom-input" placeholder="••••••••" required />
                 </div>
 
-                <!-- Abilitazione Notifiche Push -->
                 <div class="push-notification-opt">
                   <input type="checkbox" id="allow-push-notifications" checked />
                   <label for="allow-push-notifications">
@@ -1161,7 +1128,7 @@
 
     </main>
 
-    <!-- Navigation Bottom Bar (Stile Tablet/Mobile App esatto) -->
+    <!-- Navigation Bottom Bar -->
     <nav class="bottom-nav-bar">
       <div id="nav-home" class="nav-tab-item active" onclick="switchView('home')">
         <div class="tab-icon-wrapper">
@@ -1191,9 +1158,8 @@
 
   </div>
 
-  <!-- Logica Applicativa Interattiva -->
   <script>
-    // Gestione della Navigazione Principale delle Viste
+    // Gestione navigazione
     function switchView(viewId) {
       document.querySelectorAll('.view').forEach(view => {
         view.classList.add('hidden');
@@ -1213,7 +1179,6 @@
         targetNav.classList.add('active');
       }
 
-      // Torna in alto quando cambi vista
       window.scrollTo(0, 0);
     }
 
@@ -1231,36 +1196,40 @@
     // Richiesta permessi nativi Notifiche Push
     function requestPushPermission(callback) {
       if (!('Notification' in window)) {
-        alert('Il dispositivo attuale non supporta le notifiche push native del browser.');
         if (callback) callback();
         return;
       }
 
       Notification.requestPermission().then(permission => {
         if (permission === 'granted') {
-          alert('Notifiche Push attivate con successo su questo dispositivo!');
-        } else if (permission === 'denied') {
-          alert('Notifiche non abilitate. Se vuoi riattivarle, sbloccale dal lucchetto della barra degli indirizzi del browser.');
+          console.log('Notifiche Push attivate.');
         }
         if (callback) callback();
       });
     }
 
-    // Simulazione di accesso riuscito (Personalizzazione UI)
+    // Aggiornamento dinamico del profilo e del benvenuto nella Home
     function applyUserProfile(email) {
       const displayEmail = email || "andrea.lisai@example.com";
-      const initials = displayEmail.substring(0, 2).toUpperCase();
       const userName = displayEmail.split('@')[0];
       
-      // Converte i dettagli in base alle immagini (Esempio: Andrea Lisai)
       const finalName = userName.toLowerCase() === 'you' || userName.includes('example') ? 'Andrea Lisai' : userName;
-      const finalInitials = finalName === 'Andrea Lisai' ? 'AL' : initials;
-
-      document.getElementById('user-avatar').innerText = finalInitials;
-      document.getElementById('user-fullname').innerText = finalName;
+      
+      // Aggiorna il testo di benvenuto sulla Home Page
+      document.getElementById('username-display').innerText = finalName;
+      
+      // Aggiorna l'avatar nella barra in alto a destra
+      const initials = finalName.split(' ').map(n => n[0]).join('').toUpperCase();
+      const profileBtn = document.getElementById('header-profile-btn');
+      
+      profileBtn.innerHTML = `
+        <div class="user-avatar-circle">
+          ${initials}
+        </div>
+      `;
     }
 
-    // Login Utente
+    // Login
     function handleLoginSuccess(event) {
       event.preventDefault();
       const emailVal = document.getElementById('login-email').value;
@@ -1269,7 +1238,7 @@
       switchView('home');
     }
 
-    // Registrazione Utente + Attivazione Notifiche
+    // Registrazione
     function handleRegistration(event) {
       event.preventDefault();
       const emailVal = document.getElementById('register-email').value;
@@ -1284,17 +1253,17 @@
         });
       } else {
         applyUserProfile(emailVal);
-        alert('Registrazione completata senza notifiche push.');
+        alert('Registrazione completata!');
         toggleAuthMode(false);
         switchView('home');
       }
     }
 
-    // Login o registrazione Google
+    // Login Google
     function handleGoogleSuccess(actionType) {
       requestPushPermission(() => {
         applyUserProfile("Andrea Lisai");
-        alert(`${actionType} tramite account Google completato!`);
+        alert(`${actionType} completato!`);
         switchView('home');
       });
     }
