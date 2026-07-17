@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>U17 ECC AP</title>
+  <title>U17 ePRO</title>
 
   <!-- Collegamento al Manifest per PWA / Icona Mobile -->
   <link rel="manifest" href="/manifest.json" />
@@ -20,20 +20,22 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-  <!-- Stili CSS integrati per Layout e Design Swiss Style -->
   <style>
-    /* Reset di base */
+    /* Reset e Variabili globali */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
     }
 
     body {
-      font-family: 'Helvetica Neue', Arial, sans-serif;
       background-color: #f4f6f9;
       color: #333333;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 70px; /* Spazio per la bottom bar */
     }
 
     /* Header Swiss Basketball */
@@ -46,35 +48,31 @@
       align-items: center;
       justify-content: space-between;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      position: relative;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
-    /* Contenitore per il Logo Sporgente */
     .logo-container {
       position: relative;
       height: 100%;
       display: flex;
       align-items: center;
+      cursor: pointer;
     }
 
     .logo-img {
       height: 95px;
       width: auto;
       position: absolute;
-      top: 8px; /* Fa sbordare l'icona del logo verso il basso */
+      top: 8px;
       left: 0;
       filter: drop-shadow(0px 4px 10px rgba(0, 0, 0, 0.4));
       z-index: 100;
-      transition: transform 0.2s ease-in-out;
     }
 
-    .logo-img:hover {
-      transform: scale(1.05);
-    }
-
-    /* Titolo dell'App */
     .header-content {
-      margin-left: 110px; /* Evita che il testo si sovrapponga al logo */
+      margin-left: 110px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -100,86 +98,532 @@
       letter-spacing: 1px;
     }
 
-    /* Navigazione di destra */
-    .nav-menu {
-      display: flex;
-      gap: 20px;
-    }
-
-    .nav-link {
+    .header-login-btn {
+      background-color: transparent;
+      border: 1px solid #ffffff;
       color: #ffffff;
-      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 4px;
       font-size: 12px;
       font-weight: bold;
-      letter-spacing: 1.5px;
+      cursor: pointer;
       text-transform: uppercase;
-      transition: color 0.2s ease;
+      letter-spacing: 1px;
+      transition: all 0.2s;
     }
 
-    .nav-link:hover {
-      color: #E30613;
+    .header-login-btn:hover {
+      background-color: #ffffff;
+      color: #091F3E;
     }
 
-    /* Area Principale Contenuti */
+    /* Contenitore Principale delle Viste */
     .app-container {
-      padding: 60px 24px 24px 24px; /* Offset superiore per dare spazio al logo sporgente */
-      max-width: 1200px;
+      padding: 40px 16px 24px 16px;
+      max-width: 800px;
+      width: 100%;
       margin: 0 auto;
+      flex: 1;
     }
 
+    /* Gestione Visibilità Pagine */
+    .view {
+      display: block;
+    }
+    .hidden {
+      display: none !important;
+    }
+
+    /* Card di Contenuto */
     .content-card {
       background: #ffffff;
       border-radius: 8px;
-      padding: 40px;
-      text-align: center;
+      padding: 24px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.05);
       border-top: 4px solid #091F3E;
-      margin-top: 40px;
+      margin-bottom: 20px;
     }
 
     .content-card h2 {
       color: #091F3E;
-      font-size: 1.8rem;
-      margin-bottom: 12px;
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .content-card p {
-      color: #666666;
-      font-size: 1rem;
-      line-height: 1.5;
+    /* Sotto-Tab Sezione Stagione */
+    .sub-tabs {
+      display: flex;
+      background-color: #e2e8f0;
+      border-radius: 6px;
+      padding: 4px;
+      margin-bottom: 20px;
+      gap: 4px;
+    }
+
+    .sub-tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 10px 8px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #4a5568;
+      cursor: pointer;
+      border-radius: 4px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
+    .sub-tab-btn.active {
+      background-color: #091F3E;
+      color: #ffffff;
+    }
+
+    /* Form di Login e Registrazione */
+    .auth-container {
+      max-width: 400px;
+      margin: 40px auto;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #4a5568;
+      text-transform: uppercase;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #091F3E;
+    }
+
+    /* Checkbox personalizzato per le notifiche push */
+    .checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 20px 0;
+      cursor: pointer;
+    }
+
+    .checkbox-group input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      margin-top: 2px;
+    }
+
+    .checkbox-group label {
+      font-size: 13px;
+      color: #4a5568;
+      line-height: 1.4;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background-color: #E30613;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 10px;
+    }
+
+    .btn-submit:hover {
+      background-color: #b8050f;
+    }
+
+    .google-btn {
+      width: 100%;
+      background-color: #ffffff;
+      color: #333333;
+      border: 1px solid #cbd5e0;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .google-btn:hover {
+      background-color: #f7fafc;
+    }
+
+    .auth-toggle {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #4a5568;
+    }
+
+    .auth-toggle span {
+      color: #E30613;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 65px;
+      background-color: #091F3E;
+      border-top: 3px solid #E30613;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #a0aec0;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      width: 25%;
+      height: 100%;
+      gap: 4px;
+      transition: color 0.2s;
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    .nav-item.active {
+      color: #ffffff;
+      border-top: 3px solid #ffffff;
+      margin-top: -3px;
+    }
+
+    /* Tabelle Mock Dati */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #f7fafc;
+      color: #4a5568;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <!-- Header Ufficiale in Stile Swiss Basketball -->
+  <!-- Header -->
   <header class="swiss-header">
-    <div class="logo-container">
-      <img class="logo-img" src="/logo.png" alt="U17 ECC AP Logo" />
+    <div class="logo-container" onclick="switchView('home')">
+      <img class="logo-img" src="/logo.png" alt="U17 ePRO Logo" />
     </div>
-
     <div class="header-content">
-      <span class="brand-title">U17 ECC AP</span>
+      <span class="brand-title">U17 ePRO</span>
       <span class="brand-separator">•</span>
-      <span class="brand-subtitle">CAMPIONATO</span>
+      <span class="brand-subtitle">SWISS BASKET</span>
     </div>
-
-    <nav class="nav-menu">
-      <a href="#classifica" class="nav-link">Classifica</a>
-      <a href="#partite" class="nav-link">Partite</a>
-    </nav>
+    <div>
+      <button class="header-login-btn" onclick="switchView('login')">Login</button>
+    </div>
   </header>
 
-  <!-- Contenitore per lo sviluppo dei contenuti futuri dell'App -->
+  <!-- Area Principale Contenuti -->
   <main class="app-container">
-    <div id="root">
-      <!-- Se usi React o Vue, l'app monterà i componenti qui dentro -->
+
+    <!-- VISTA: HOME -->
+    <section id="view-home" class="view">
       <div class="content-card">
-        <h2>Benvenuto nell'applicazione U17 ECC AP</h2>
-        <p>L'app è configurata correttamente. L'header è responsive e il tuo logo originale è impostato come favicon e icona per la schermata home del telefono.</p>
+        <h2>Benvenuto a Bordo</h2>
+        <p>Benvenuto nell'app ufficiale di <strong>U17 ePRO</strong>. Esplora i tab in basso per visualizzare calendario, classifiche, statistiche, ultime notizie o per registrarti per ricevere notifiche push in tempo reale.</p>
       </div>
-    </div>
+    </section>
+
+    <!-- VISTA: STAGIONE -->
+    <section id="view-stagione" class="view hidden">
+      <div class="sub-tabs">
+        <button id="tab-btn-calendario" class="sub-tab-btn active" onclick="switchStagioneTab('calendario')">Calendario</button>
+        <button id="tab-btn-classifica" class="sub-tab-btn" onclick="switchStagioneTab('classifica')">Classifica</button>
+        <button id="tab-btn-statistiche" class="sub-tab-btn" onclick="switchStagioneTab('statistiche')">Statistiche</button>
+      </div>
+
+      <!-- Sotto-Sezione: Calendario -->
+      <div id="sub-view-calendario">
+        <div class="content-card">
+          <h2>Prossime Partite</h2>
+          <table>
+            <tr><th>Data</th><th>Avversario</th><th>Ora</th></tr>
+            <tr><td>24 Oatt</td><td>Riva Basket</td><td>16:00</td></tr>
+            <tr><td>31 Ott</td><td>SAM Massagno</td><td>14:30</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sotto-Sezione: Classifica -->
+      <div id="sub-view-classifica" class="hidden">
+        <div class="content-card">
+          <h2>Classifica Campionato</h2>
+          <table>
+            <tr><th>Pos</th><th>Squadra</th><th>Punti</th></tr>
+            <tr><td>1</td><td><strong>U17 ePRO</strong></td><td>12</td></tr>
+            <tr><td>2</td><td>Lugano Tigers</td><td>10</td></tr>
+            <tr><td>3</td><td>SAM Massagno</td><td>8</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sotto-Sezione: Statistiche -->
+      <div id="sub-view-statistiche" class="hidden">
+        <div class="content-card">
+          <h2>Statistiche di Squadra</h2>
+          <p>Media Punti Segnati: <strong>78.4</strong></p>
+          <p>Media Punti Subiti: <strong>64.2</strong></p>
+          <p>Falli di Squadra (Media): <strong>14.5</strong></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA: ROSTER & STAFF -->
+    <section id="view-roster" class="view hidden">
+      <div class="content-card">
+        <h2>Il Roster</h2>
+        <table>
+          <tr><th>Numero</th><th>Giocatore</th><th>Ruolo</th></tr>
+          <tr><td>#4</td><td>M. Rossi</td><td>Playmaker</td></tr>
+          <tr><td>#8</td><td>L. Bianchi</td><td>Guardia</td></tr>
+          <tr><td>#15</td><td>G. Verdi</td><td>Centro</td></tr>
+        </table>
+      </div>
+      <div class="content-card">
+        <h2>Staff Tecnico</h2>
+        <p>Capo Allenatore: <strong>Coach Admin</strong></p>
+        <p>Vice Allenatore: <strong>Coach Assistente</strong></p>
+      </div>
+    </section>
+
+    <!-- VISTA: NEWS -->
+    <section id="view-news" class="view hidden">
+      <div class="content-card">
+        <h2>Ultimi Aggiornamenti</h2>
+        <h3 style="margin: 10px 0 5px 0; color: #E30613;">Nuovo Brand: Nasce U17 ePRO</h3>
+        <p>L'applicazione e il team aggiornano la propria identità visiva ed evolvono verso il nuovo ecosistema digitale ePRO.</p>
+      </div>
+    </section>
+
+    <!-- VISTA: LOGIN / REGISTRAZIONE -->
+    <section id="view-login" class="view hidden">
+      <div class="content-card auth-container">
+        <!-- Form Accedi -->
+        <div id="auth-login-box">
+          <h2>Accedi</h2>
+          <form onsubmit="event.preventDefault(); alert('Accesso effettuato come Admin (Credenziali invariate)');">
+            <div class="form-group">
+              <label>Email o Username Admin</label>
+              <input type="text" placeholder="Inserisci la tua email" required />
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" placeholder="••••••••" required />
+            </div>
+            <button type="submit" class="btn-submit">Accedi</button>
+          </form>
+          <button class="google-btn" onclick="alert('Connessione ad account Google in corso...')">
+            <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Accedi con Google
+          </button>
+          <div class="auth-toggle">Non hai un account? <span onclick="toggleAuthMode(true)">Registrati</span></div>
+        </div>
+
+        <!-- Form Registrati -->
+        <div id="auth-register-box" class="hidden">
+          <h2>Registrati</h2>
+          <form onsubmit="handleRegistration(event)">
+            <div class="form-group">
+              <label>Indirizzo Email</label>
+              <input type="email" placeholder="esempio@email.com" required />
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" placeholder="Crea una password" required />
+            </div>
+            
+            <!-- Opzione Notifiche Push -->
+            <div class="checkbox-group">
+              <input type="checkbox" id="allow-push-notifications" checked />
+              <label for="allow-push-notifications">
+                Desidero ricevere le notifiche push sul mio dispositivo (mobile o desktop) per risultati, news e variazioni orari.
+              </label>
+            </div>
+
+            <button type="submit" class="btn-submit">Crea Account</button>
+          </form>
+          <button class="google-btn" onclick="handleGoogleRegister()">
+            <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Registrati con Google
+          </button>
+          <div class="auth-toggle">Hai già un account? <span onclick="toggleAuthMode(false)">Accedi</span></div>
+        </div>
+      </div>
+    </section>
+
   </main>
+
+  <!-- Bottom Navigation Bar Mobile-First -->
+  <nav class="bottom-nav">
+    <div id="nav-home" class="nav-item active" onclick="switchView('home')">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Home
+    </div>
+    <div id="nav-stagione" class="nav-item" onclick="switchView('stagione')">
+      <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+      Stagione
+    </div>
+    <div id="nav-roster" class="nav-item" onclick="switchView('roster')">
+      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      Roster
+    </div>
+    <div id="nav-news" class="nav-item" onclick="switchView('news')">
+      <svg viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-1 12H5V9h14v8z"/></svg>
+      News
+    </div>
+  </nav>
+
+  <!-- Logica Applicativa Javascript per la Navigazione e Notifiche -->
+  <script>
+    // Cambia la vista principale dell'applicazione
+    function switchView(viewId) {
+      document.querySelectorAll('.view').forEach(view => {
+        view.classList.add('hidden');
+      });
+
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      const targetView = document.getElementById(`view-${viewId}`);
+      if (targetView) {
+        targetView.classList.remove('hidden');
+      }
+
+      const targetNav = document.getElementById(`nav-${viewId}`);
+      if (targetNav) {
+        targetNav.classList.add('active');
+      }
+    }
+
+    // Cambia i sotto-tab all'interno della sezione Stagione
+    function switchStagioneTab(tabId) {
+      const subViews = ['calendario', 'classifica', 'statistiche'];
+      
+      subViews.forEach(view => {
+        document.getElementById(`sub-view-${view}`).classList.add('hidden');
+        document.getElementById(`tab-btn-${view}`).classList.remove('active');
+      });
+
+      document.getElementById(`sub-view-${tabId}`).classList.remove('hidden');
+      document.getElementById(`tab-btn-${tabId}`).classList.add('active');
+    }
+
+    // Switch tra box di Login e box di Registrazione
+    function toggleAuthMode(isRegister) {
+      if (isRegister) {
+        document.getElementById('auth-login-box').classList.add('hidden');
+        document.getElementById('auth-register-box').classList.remove('hidden');
+      } else {
+        document.getElementById('auth-register-box').classList.add('hidden');
+        document.getElementById('auth-login-box').classList.remove('hidden');
+      }
+    }
+
+    // Gestione richiesta Notifiche Push di sistema
+    function requestPushPermission(callback) {
+      if (!('Notification' in window)) {
+        alert('Questo dispositivo o browser non supporta le notifiche push.');
+        if (callback) callback();
+        return;
+      }
+
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          alert('Notifiche push attivate con successo per U17 ePRO!');
+        } else if (permission === 'denied') {
+          alert('Hai bloccato le notifiche. Puoi riattivarle dalle impostazioni del browser del tuo smartphone.');
+        }
+        if (callback) callback();
+      });
+    }
+
+    // Esecuzione registrazione classica via Email
+    function handleRegistration(event) {
+      event.preventDefault();
+      const pushCheckbox = document.getElementById('allow-push-notifications');
+      
+      if (pushCheckbox && pushCheckbox.checked) {
+        requestPushPermission(() => {
+          alert('Registrazione completata con successo!');
+          toggleAuthMode(false);
+          switchView('home');
+        });
+      } else {
+        alert('Registrazione completata con successo! (Notifiche push disattivate)');
+        toggleAuthMode(false);
+        switchView('home');
+      }
+    }
+
+    // Esecuzione registrazione via Google Account
+    function handleGoogleRegister() {
+      requestPushPermission(() => {
+        alert('Registrazione con account Google e sincronizzazione notifiche completata!');
+        toggleAuthMode(false);
+        switchView('home');
+      });
+    }
+  </script>
 
 </body>
 </html>
