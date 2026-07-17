@@ -1,114 +1,145 @@
 const express = require('express');
-const fs = require('fs');
+const multer = require('multer');
 const path = require('path');
-const multer = require('multer'); // Per gestire l'upload di immagini
+const fs = require('fs');
+
 const app = express();
+
+// 1. Configurazione della porta e della password sicura
 const PORT = process.env.PORT || 3000;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'adminpassword';
 
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Cartella pubblica per le immagini
+const DB_FILE = path.join(__dirname, 'db.json');
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
-// Crea la cartella uploads se non esiste
-if (!fs.existsSync('./uploads')) {
-  fs.mkdirSync('./uploads');
+// 2. Inizializza il file db.json se non esiste ancora
+if (!fs.existsSync(DB_FILE)) {
+  const initialData = {
+    matches: [],
+    news: [],
+    roster: [],
+    themeColor: '#f97316'
+  };
+  fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2));
 }
 
-// Configurazione salvataggio Immagini
+// 3. Assicurati che la cartella 'uploads' esista per salvare le immagini
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR);
+}
+
+// 4. Middleware
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(UPLOADS_DIR)); // Serve pubblicamente le immagini caricate
+
+// 5. Configurazione Multer per il salvataggio dei file immagine
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
 });
 const upload = multer({ storage: storage });
 
-const DB_FILE = path.join(__dirname, 'db.json');
-
-const defaultData = {
-  themeColor: '#f97316', // Arancione di default (HEX)
-  users: [
-    { email: "admin@epro.com", password: "adminpassword", notifications: true, isAdmin: true }
-  ],
-  matches: [],
-  news: [],
-  roster: []
-};
-
-function readDB() {
-  if (!fs.existsSync(DB_FILE)) {
-    fs.writeFileSync(DB_FILE, JSON.stringify(defaultData, null, 2));
-    return defaultData;
-  }
-  return JSON.parse(fs.readFileSync(DB_FILE));
+// Helper per leggere e scrivere sul file db.json
+function readDatabase() {
+  return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
 }
 
-function writeDB(data) {
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+function writeDatabase(data) {
+  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
 }
 
-// API: Ottieni configurazione e dati
+// ================= ROTTE API =================
+
+// Carica tutti i dati all'avvio dell'app
 app.get('/api/data', (req, res) => {
-  res.json(readDB());
+  res.json(readDatabase());
 });
 
-// API: Login
+// Rotta per il Login dell'Amministratore (Verifica Sicura)
 app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body;
-  const db = readDB();
-  let user = db.users.find(u => u.email.toLowerCase() === email.toLowerCase());
-  if (user && user.password !== password) return res.status(401).json({ error: "Password errata" });
-  if (!user) {
-    user = { email: email.toLowerCase(), password, notifications: false, isAdmin: false };
-    db.users.push(user);
-    writeDB(db);
+  
+  if (email === 'admin@epro.com' && password === ADMIN_PASSWORD) {
+    return res.json({ email, isAdmin: true, notifications: false });
   }
-  res.json(user);
+  
+  res.status(401).json({ error: 'Credenziali non valide' });
 });
 
-// API: Aggiorna Colore Tema (Stile)
-app.post('/api/admin/theme', (req, res) => {
-  const { color } = req.body;
-  const db = readDB();
-  db.themeColor = color;
-  writeDB(db);
-  res.json({ success: true, themeColor: db.themeColor });
+// Mock per il toggle delle notifiche
+app.post('/api/user/notifications', (req, res) => {
+  res.json({ success: true });
 });
 
-// API: Carica Immagine (Ritorna l'URL dell'immagine caricata)
+// Rotta Admin: Caricamento Immagine (Roster o News)
 app.post('/api/admin/upload', upload.single('image'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: "Nessun file caricato" });
+  if (!req.file) {
+    return res.status(400).json({ error: 'Nessun file caricato' });
+  }
   res.json({ imageUrl: `/uploads/${req.file.filename}` });
 });
 
-// API: Aggiungi Giocatore/Staff al Roster
+// Rotta Admin: Salva Partita
+app.post('/api/admin/match', (req, res) => {
+  const data = readDatabase();
+  const newMatch = { id: Date.now(), ...req.body };
+  data.matches.push(newMatch);
+  writeDatabase(data);
+  res.json({ success: true, matches: data.matches });
+});
+
+// Rotta Admin: Salva Membro del Roster
 app.post('/api/admin/roster', (req, res) => {
-  const { name, role, number, category, imageUrl } = req.body;
-  const db = readDB();
-  const newItem = { id: Date.now(), name, role, number: number || null, category, imageUrl: imageUrl || null };
-  db.roster.push(newItem);
-  writeDB(db);
-  res.json({ success: true, roster: db.roster });
+  const data = readDatabase();
+  const newMember = { id: Date.now(), ...req.body };
+  data.roster.push(newMember);
+  writeDatabase(data);
+  res.json({ success: true, roster: data.roster });
 });
 
-// API: Elimina elemento Roster
+// Rotta Admin: Elimina Membro del Roster
 app.delete('/api/admin/roster/:id', (req, res) => {
-  const db = readDB();
-  db.roster = db.roster.filter(r => r.id !== parseInt(req.params.id));
-  writeDB(db);
-  res.json({ success: true, roster: db.roster });
+  const id = parseInt(req.params.id);
+  const data = readDatabase();
+  data.roster = data.roster.filter(member => member.id !== id);
+  writeDatabase(data);
+  res.json({ success: true, roster: data.roster });
 });
 
-// API: Aggiungi News
+// Rotta Admin: Pubblica Notizia
 app.post('/api/admin/news', (req, res) => {
-  const { title, content, tag, imageUrl } = req.body;
-  const db = readDB();
-  const newNews = {
-    id: Date.now(),
-    title, content, tag, imageUrl,
-    date: new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })
+  const data = readDatabase();
+  const newNews = { 
+    id: Date.now(), 
+    date: new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' }), 
+    ...req.body 
   };
-  db.news.unshift(newNews);
-  writeDB(db);
-  res.json({ success: true, news: db.news });
+  data.news.unshift(newNews); // Aggiunge la news in cima alla lista
+  writeDatabase(data);
+  res.json({ success: true, news: data.news });
 });
 
-app.listen(PORT, () => console.log(`Server pronto su http://localhost:${PORT}`));
+// Rotta Admin: Salva colore del Tema
+app.post('/api/admin/theme', (req, res) => {
+  const { color } = req.body;
+  const data = readDatabase();
+  data.themeColor = color;
+  writeDatabase(data);
+  res.json({ success: true });
+});
+
+// Rotta catch-all per servire l'index.html in caso di ricaricamento pagina
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Avvio del server
+app.listen(PORT, () => {
+  console.log(`Server ePRO Basket attivo sulla porta ${PORT}`);
+});
