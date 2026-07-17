@@ -1,0 +1,126 @@
+{
+  "themeColor": "#E61E2B",
+  "matches": [
+    {
+      "id": 1,
+      "opponent": "Basket Torino",
+      "date": "22 Nov 2026",
+      "time": "18:30",
+      "location": "Pala專ePRO - Collegno (TO)",
+      "type": "CASA",
+      "status": "Prossima",
+      "score": ""
+    },
+    {
+      "id": 2,
+      "opponent": "College Borgomanero",
+      "date": "15 Nov 2026",
+      "time": "11:00",
+      "location": "PalaCadorna - Borgomanero (NO)",
+      "type": "FUORI",
+      "status": "Terminata",
+      "score": "74-70"
+    },
+    {
+      "id": 3,
+      "opponent": "Novara Basket",
+      "date": "08 Nov 2026",
+      "time": "19:00",
+      "location": "PalaePRO - Collegno (TO)",
+      "type": "CASA",
+      "status": "Terminata",
+      "score": "82-65"
+    },
+    {
+      "id": 4,
+      "opponent": "Biella Next",
+      "date": "01 Nov 2026",
+      "time": "17:30",
+      "location": "Pajetta - Biella (BI)",
+      "type": "FUORI",
+      "status": "Terminata",
+      "score": "61-68"
+    }
+  ],
+  "news": [
+    {
+      "id": 1,
+      "title": "Vittoria schiacciante nel derby contro Novara!",
+      "content": "I ragazzi dell'U17 sfoderano una prestazione difensiva impeccabile nell'ultimo quarto, chiudendo il match sul +17. MVP dell'incontro Matteo Rossi con 22 punti.",
+      "tag": "Match Recap",
+      "date": "09 Nov 2026",
+      "imageUrl": "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600"
+    },
+    {
+      "id": 2,
+      "title": "Tre dei nostri convocati al raduno Regionale Piemonte",
+      "content": "Grande orgoglio in casa ePRO: Rossi, Bianchi e Verdi sono stati selezionati per il prossimo raduno di eccellenza della FIP Piemonte.",
+      "tag": "Club News",
+      "date": "05 Nov 2026",
+      "imageUrl": "https://images.unsplash.com/photo-1519766304817-4f37bda74a27?w=600"
+    }
+  ],
+  "roster": [
+    {
+      "id": 1,
+      "name": "Matteo Rossi",
+      "role": "Playmaker",
+      "number": "4",
+      "category": "giocatori",
+      "imageUrl": "https://images.unsplash.com/photo-1519766304817-4f37bda74a27?w=150"
+    },
+    {
+      "id": 2,
+      "name": "Luca Bianchi",
+      "role": "Guardia",
+      "number": "8",
+      "category": "giocatori",
+      "imageUrl": "https://images.unsplash.com/photo-1505664194762-8cd9975724fe?w=150"
+    },
+    {
+      "id": 3,
+      "name": "Alessandro Verdi",
+      "role": "Ala Grande",
+      "number": "11",
+      "category": "giocatori",
+      "imageUrl": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=150"
+    },
+    {
+      "id": 4,
+      "name": "Davide Neri",
+      "role": "Centro",
+      "number": "15",
+      "category": "giocatori",
+      "imageUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150"
+    },
+    {
+      "id": 5,
+      "name": "Marco Brunelli",
+      "role": "Head Coach",
+      "number": "",
+      "category": "staff",
+      "imageUrl": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150"
+    },
+    {
+      "id": 6,
+      "name": "Andrea Gatti",
+      "role": "Assistant Coach",
+      "number": "",
+      "category": "staff",
+      "imageUrl": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150"
+    }
+  ],
+  "standings": [
+    { "id": 1, "team": "AREA PRO", "points": 18 },
+    { "id": 2, "team": "Basket Torino", "points": 16 },
+    { "id": 3, "team": "College Borgomanero", "points": 14 },
+    { "id": 4, "team": "Biella Next", "points": 12 },
+    { "id": 5, "team": "Novara Basket", "points": 10 }
+  ],
+  "stats": [
+    { "id": 1, "name": "Matteo Rossi", "games": 4, "totalPoints": 72 },
+    { "id": 2, "name": "Luca Bianchi", "games": 4, "totalPoints": 48 },
+    { "id": 3, "name": "Alessandro Verdi", "games": 3, "totalPoints": 33 },
+    { "id": 4, "name": "Davide Neri", "games": 4, "totalPoints": 28 }
+  ]
+}
