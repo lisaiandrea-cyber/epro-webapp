@@ -1,538 +1,68 @@
 <!DOCTYPE html>
-<html lang="it" class="h-full">
+<html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>U17 ePRO Basketball</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- AlpineJS -->
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <!-- Google Fonts: Inter -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js"></script>
-
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-    input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pannello Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; }
+        .container { max-width: 500px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        input, button { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+        button { background-color: #3b82f6; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #2563eb; }
+        #error-msg { color: red; font-size: 14px; text-align: center; }
+    </style>
 </head>
-<body class="bg-gray-100 text-slate-900 min-h-full flex flex-col justify-between pb-24" 
-      x-data="{ 
-        activeTab: 'home', 
-        showAuthModal: false, 
-        authMode: 'login', 
-        isLoggedIn: false, 
-        isAdmin: false,
-        notificationsEnabled: false,
-        email: '',
-        password: '',
-        themeColor: '#E61E2B',
-        userDisplayName: '',
+<body>
+
+<div class="container">
+    <h2>Accedi come Admin</h2>
+    <form id="login-form">
+        <input type="text" id="username" placeholder="Username Admin" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Accedi</button>
+    </form>
+    <p id="error-msg"></p>
+</div>
+
+<script>
+    // ⚠️ CONFIGURAZIONE URL BACKEND:
+    // Sostituisci con l'URL che ti assegna Render (es: 'https://miosito.onrender.com') se sei in produzione.
+    const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5000'
+        : 'https://epro-webapp.onrender.com'; // <--- Incolla qui il link di Render
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
         
-        // Liste Dati
-        matches: [],
-        news: [],
-        roster: [],
-        standings: [],
-        stats: [],
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorMsg = document.getElementById('error-msg');
         
-        // Form Admin
-        newMatch: { opponent: '', date: '', time: '', location: '', type: 'CASA', status: 'Prossima', score: '' },
-        newMember: { name: '', role: '', number: '', category: 'giocatori', imageUrl: '' },
-        newNews: { title: '', content: '', tag: 'Club News', imageUrl: '' },
-        newTeam: { team: '', points: '' },
-        newStat: { name: '', games: '', totalPoints: '' },
+        errorMsg.textContent = "";
 
-        // Inizializzazione Firebase
-        firebaseConfig: {
-          apiKey: 'AIzaSyCNn9yVzGopJrjQcevac-UsOp4TAMz8Y6E',
-          authDomain: 'epro-web.firebaseapp.com',
-          projectId: 'epro-web',
-          storageBucket: 'epro-web.firebasestorage.app',
-          messagingSenderId: '360243781432',
-          appId: '1:360243781432:web:c2a70f3ef45df0c9d96bcd'
-        },
-
-        async init() {
-          firebase.initializeApp(this.firebaseConfig);
-          await this.loadData();
-
-          firebase.auth().onAuthStateChanged(async (user) => {
-            if (user) {
-              this.isLoggedIn = true;
-              this.userDisplayName = user.displayName || user.email;
-              this.email = user.email;
-              
-              const token = await user.getIdToken();
-              const res = await fetch('/api/auth/verify', {
-                headers: { 'Authorization': `Bearer ${token}` }
-              });
-              const authInfo = await res.json();
-              this.isAdmin = authInfo.isAdmin;
-              this.notificationsEnabled = authInfo.notifications;
-            } else {
-              this.isLoggedIn = false;
-              this.isAdmin = false;
-              this.userDisplayName = '';
-            }
-          });
-        },
-
-        async loadData() {
-          const res = await fetch('/api/data');
-          const data = await res.json();
-          this.matches = data.matches || [];
-          this.news = data.news || [];
-          this.roster = data.roster || [];
-          this.standings = data.standings || [];
-          this.stats = data.stats || [];
-          this.themeColor = data.themeColor || '#E61E2B';
-        },
-
-        async handleEmailAuth() {
-          try {
-            if (this.authMode === 'login') {
-              await firebase.auth().signInWithEmailAndPassword(this.email, this.password);
-            } else if (this.authMode === 'register') {
-              await firebase.auth().createUserWithEmailAndPassword(this.email, this.password);
-              alert('Registrazione completata!');
-            }
-            this.showAuthModal = false;
-            this.password = '';
-          } catch (err) {
-            alert(err.message);
-          }
-        },
-
-        async handleGoogleAuth() {
-          try {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            await firebase.auth().signInWithPopup(provider);
-            this.showAuthModal = false;
-          } catch (err) {
-            alert(err.message);
-          }
-        },
-
-        async handlePasswordReset() {
-          try {
-            await firebase.auth().sendPasswordResetEmail(this.email);
-            alert('Email di reset password inviata con successo!');
-            this.authMode = 'login';
-          } catch (err) {
-            alert(err.message);
-          }
-        },
-
-        async logout() {
-          await firebase.auth().signOut();
-          this.showAuthModal = false;
-          this.activeTab = 'home';
-        },
-
-        async requestPushNotifications() {
-          try {
-            const messaging = firebase.messaging();
-            const token = await messaging.getToken({ vapidKey: 'INSERISCI_LA_TUA_VAPID_KEY_PUBBLICA' });
-            
-            if (token) {
-              const userToken = await firebase.auth().currentUser.getIdToken();
-              await fetch('/api/user/subscribe', {
+        try {
+            const response = await fetch(`${API_URL}/api/login`, {
                 method: 'POST',
-                headers: { 
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${userToken}`
-                },
-                body: JSON.stringify({ pushToken: token })
-              });
-              this.notificationsEnabled = true;
-              alert('Notifiche push attivate!');
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert('Accesso Admin riuscito!');
+                // Reindirizza l'utente o carica i dati protetti
+                console.log(result.user);
+            } else {
+                errorMsg.textContent = result.message || 'Errore durante l\'accesso.';
             }
-          } catch (err) {
+        } catch (err) {
             console.error(err);
-            alert('Consenti le notifiche dal browser.');
-          }
-        },
-
-        // Salvataggi Admin
-        async saveMatch() {
-          const res = await fetch('/api/admin/match', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(this.newMatch)
-          });
-          const data = await res.json();
-          if (data.success) {
-            this.matches = data.matches;
-            alert('Partita salvata!');
-            this.newMatch = { opponent: '', date: '', time: '', location: '', type: 'CASA', status: 'Prossima', score: '' };
-          }
-        },
-
-        async saveNews() {
-          const res = await fetch('/api/admin/news', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(this.newNews)
-          });
-          const data = await res.json();
-          if (data.success) {
-            this.news = data.news;
-            alert('Notizia pubblicata!');
-            this.newNews = { title: '', content: '', tag: 'Club News', imageUrl: '' };
-          }
-        },
-
-        async saveMember() {
-          const res = await fetch('/api/admin/roster', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(this.newMember)
-          });
-          const data = await res.json();
-          if (data.success) {
-            this.roster = data.roster;
-            alert('Membro roster salvato!');
-            this.newMember = { name: '', role: '', number: '', category: 'giocatori', imageUrl: '' };
-          }
-        },
-
-        async saveTeam() {
-          const res = await fetch('/api/admin/standings', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(this.newTeam)
-          });
-          const data = await res.json();
-          if (data.success) {
-            this.standings = data.standings;
-            this.newTeam = { team: '', points: '' };
-          }
-        },
-
-        async saveStat() {
-          const res = await fetch('/api/admin/stats', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(this.newStat)
-          });
-          const data = await res.json();
-          if (data.success) {
-            this.stats = data.stats;
-            this.newStat = { name: '', games: '', totalPoints: '' };
-          }
-        },
-
-        async updateTheme() {
-          await fetch('/api/admin/theme', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ color: this.themeColor })
-          });
-        },
-
-        async uploadFile(e, target) {
-          const file = e.target.files[0];
-          if (!file) return;
-          const formData = new FormData();
-          formData.append('image', file);
-          const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
-          const data = await res.json();
-          if (target === 'roster') this.newMember.imageUrl = data.imageUrl;
-          if (target === 'news') this.newNews.imageUrl = data.imageUrl;
+            errorMsg.textContent = 'Impossibile connettersi al server.';
         }
-      }">
-
-  <!-- HEADER -->
-  <header class="bg-white border-b border-gray-200 sticky top-0 z-50 px-4 py-3 flex items-center justify-between shadow-sm">
-    <div class="flex items-center space-x-3">
-      <img src="/logo.png?v=1" alt="Logo" class="w-11 h-11 object-contain" onerror="this.src='https://images.unsplash.com/photo-1546519638-68e109498ffc?w=100'">
-      <div>
-        <h1 class="text-base font-extrabold tracking-tight text-slate-900">U17 <span :style="`color: ${themeColor}`">ePRO</span></h1>
-        <p class="text-[9px] text-gray-500 font-bold tracking-wider uppercase">Youth League Basket</p>
-      </div>
-    </div>
-    
-    <div>
-      <button @click="showAuthModal = true" class="p-2.5 bg-gray-100 hover:bg-gray-200 rounded-full transition text-slate-600">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-        </svg>
-      </button>
-    </div>
-  </header>
-
-  <!-- CONTENUTO PRINCIPALE -->
-  <main class="flex-1 max-w-md mx-auto w-full px-4 py-5">
-
-    <!-- ================= SECTION: HOME ================= -->
-    <section x-show="activeTab === 'home'" class="space-y-5">
-      <!-- Abilitazione Notifiche Push -->
-      <div x-show="isLoggedIn && !notificationsEnabled" class="bg-white border border-gray-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
-        <div class="space-y-0.5">
-          <h4 class="font-bold text-xs text-slate-900">Notifiche Attive? 🔔</h4>
-          <p class="text-[10px] text-gray-500">Ricevi i risultati finali in tempo reale.</p>
-        </div>
-        <button @click="requestPushNotifications()" :style="`background-color: ${themeColor}`" class="text-white font-bold text-[11px] px-3.5 py-2 rounded-lg uppercase tracking-wider">
-          Attiva
-        </button>
-      </div>
-
-      <!-- Prossimo Match -->
-      <div>
-        <h3 class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 mb-2.5">Prossimo incontro</h3>
-        <template x-if="matches.filter(m => m.status === 'Prossima').length > 0">
-          <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-            <div class="text-white px-4 py-2 flex justify-between items-center text-[10px] font-bold" :style="`background-color: ${themeColor}`">
-              <span>CAMPIONATO NAZIONALE</span>
-              <span x-text="matches.filter(m => m.status === 'Prossima')[0].type"></span>
-            </div>
-            <div class="p-5 text-center">
-              <div class="flex items-center justify-between">
-                <div class="flex-1">
-                  <img src="/logo.png?v=1" class="w-12 h-12 object-contain mx-auto border rounded-full p-1 bg-gray-50" onerror="this.src='https://images.unsplash.com/photo-1546519638-68e109498ffc?w=100'">
-                  <p class="text-xs font-bold mt-2">ePRO</p>
-                </div>
-                <span class="text-xs font-extrabold text-gray-400">VS</span>
-                <div class="flex-1">
-                  <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto border font-bold text-lg">🏀</div>
-                  <p class="text-xs font-bold mt-2" x-text="matches.filter(m => m.status === 'Prossima')[0].opponent"></p>
-                </div>
-              </div>
-              <p class="mt-4 pt-3 border-t text-[11px] font-bold text-slate-700" x-text="matches.filter(m => m.status === 'Prossima')[0].date + ' • Ore ' + matches.filter(m => m.status === 'Prossima')[0].time"></p>
-            </div>
-          </div>
-        </template>
-      </div>
-
-      <!-- Ultime News Scorribili -->
-      <div>
-        <h3 class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 mb-2.5">Ultime Notizie</h3>
-        <div class="space-y-3">
-          <template x-for="item in news.slice(0, 2)" :key="item.id">
-            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden flex shadow-sm">
-              <img :src="item.imageUrl || 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=300'" class="w-24 h-24 object-cover flex-shrink-0">
-              <div class="p-3 flex flex-col justify-between">
-                <div>
-                  <span class="text-[8px] font-extrabold uppercase tracking-widest text-red-500" x-text="item.tag"></span>
-                  <h4 class="text-xs font-bold line-clamp-2 text-slate-800" x-text="item.title"></h4>
-                </div>
-                <span class="text-[9px] text-gray-400" x-text="item.date"></span>
-              </div>
-            </div>
-          </template>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= SECTION: SEASON ================= -->
-    <section x-show="activeTab === 'season'" class="space-y-5">
-      <div>
-        <h3 class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 mb-2.5">Calendario & Risultati</h3>
-        <div class="space-y-3">
-          <template x-for="match in matches" :key="match.id">
-            <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex justify-between items-center">
-              <div>
-                <span class="text-[9px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full uppercase" x-text="match.type"></span>
-                <p class="text-xs font-bold mt-1 text-slate-800">vs <span x-text="match.opponent"></span></p>
-                <p class="text-[10px] text-gray-400" x-text="match.date + ' • ' + match.time"></p>
-              </div>
-              <div class="text-right">
-                <template x-if="match.status === 'Terminata'">
-                  <span class="text-xs font-extrabold bg-green-50 text-green-600 border border-green-100 px-2.5 py-1 rounded-lg" x-text="match.score"></span>
-                </template>
-                <template x-if="match.status === 'Prossima'">
-                  <span class="text-[10px] font-bold text-gray-400">In programma</span>
-                </template>
-              </div>
-            </div>
-          </template>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= SECTION: ROSTER ================= -->
-    <section x-show="activeTab === 'roster'" class="space-y-5">
-      <div>
-        <h3 class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 mb-2.5">Il Gruppo Squadra</h3>
-        <div class="grid grid-cols-2 gap-3">
-          <template x-for="player in roster" :key="player.id">
-            <div class="bg-white rounded-xl border border-gray-200 p-3 text-center shadow-sm">
-              <img :src="player.imageUrl || 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=150'" class="w-16 h-16 rounded-full object-cover mx-auto border">
-              <p class="text-xs font-bold mt-2 text-slate-800" x-text="player.name"></p>
-              <p class="text-[10px] text-gray-400" x-text="player.role"></p>
-              <span class="inline-block mt-1.5 text-[10px] font-black text-white px-2 py-0.5 rounded" :style="`background-color: ${themeColor}`" x-text="'#' + player.number"></span>
-            </div>
-          </template>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= SECTION: CLASSIFICA ================= -->
-    <section x-show="activeTab === 'standings'" class="space-y-5">
-      <div>
-        <h3 class="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 mb-2.5">Classifica Girone</h3>
-        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-gray-50 border-b border-gray-100 text-[10px] font-bold text-gray-500 uppercase">
-                <th class="py-3 px-4">Squadra</th>
-                <th class="py-3 px-4 text-right">Punti</th>
-              </tr>
-            </thead>
-            <tbody class="text-xs font-medium text-slate-700">
-              <template x-for="(team, index) in standings" :key="team.id">
-                <tr class="border-b border-gray-50 hover:bg-gray-50/50">
-                  <td class="py-3 px-4 flex items-center space-x-2">
-                    <span class="font-bold text-gray-400" x-text="index + 1"></span>
-                    <span x-text="team.team"></span>
-                  </td>
-                  <td class="py-3 px-4 text-right font-bold text-slate-900" x-text="team.points"></td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= SECTION: ADMIN (Solo per Admin) ================= -->
-    <section x-show="activeTab === 'admin' && isAdmin" class="space-y-6">
-      <div class="border-b pb-2">
-        <h3 class="text-sm font-extrabold uppercase text-slate-900">Pannello di Amministrazione</h3>
-        <p class="text-[10px] text-gray-400">Gestisci i contenuti, il colore del brand e invia notifiche.</p>
-      </div>
-
-      <!-- Configurazione Colore Brand -->
-      <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
-        <h4 class="text-xs font-bold">Colore del Brand</h4>
-        <div class="flex items-center space-x-3">
-          <input type="color" x-model="themeColor" @change="updateTheme()" class="w-10 h-10 cursor-pointer">
-          <span class="text-xs text-gray-500" x-text="themeColor"></span>
-        </div>
-      </div>
-
-      <!-- Inserisci Partita -->
-      <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
-        <h4 class="text-xs font-bold">Aggiungi / Aggiorna Partita</h4>
-        <input type="text" placeholder="Avversario" x-model="newMatch.opponent" class="w-full bg-gray-50 border p-2.5 rounded-lg text-xs">
-        <div class="grid grid-cols-2 gap-2">
-          <input type="date" x-model="newMatch.date" class="bg-gray-50 border p-2.5 rounded-lg text-xs">
-          <input type="time" x-model="newMatch.time" class="bg-gray-50 border p-2.5 rounded-lg text-xs">
-        </div>
-        <select x-model="newMatch.type" class="w-full bg-gray-50 border p-2.5 rounded-lg text-xs">
-          <option value="CASA">CASA</option>
-          <option value="TRASFERTA">TRASFERTA</option>
-        </select>
-        <select x-model="newMatch.status" class="w-full bg-gray-50 border p-2.5 rounded-lg text-xs">
-          <option value="Prossima">In Programma</option>
-          <option value="Terminata">Terminata (Invia Notifica Push)</option>
-        </select>
-        <template x-if="newMatch.status === 'Terminata'">
-          <input type="text" placeholder="Risultato (es: 78-74)" x-model="newMatch.score" class="w-full bg-gray-50 border p-2.5 rounded-lg text-xs">
-        </template>
-        <button @click="saveMatch()" :style="`background-color: ${themeColor}`" class="w-full text-white font-bold py-2.5 rounded-lg text-xs uppercase">Salva Partita</button>
-      </div>
-
-      <!-- Inserisci News -->
-      <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
-        <h4 class="text-xs font-bold">Pubblica Comunicato (Notifica Push automatica)</h4>
-        <input type="text" placeholder="Titolo" x-model="newNews.title" class="w-full bg-gray-50 border p-2.5 rounded-lg text-xs">
-        <textarea placeholder="Contenuto della notizia..." x-model="newNews.content" class="w-full bg-gray-50 border p-2.5 rounded-lg text-xs h-20"></textarea>
-        <input type="file" @change="uploadFile($event, 'news')" class="w-full text-xs">
-        <button @click="saveNews()" :style="`background-color: ${themeColor}`" class="w-full text-white font-bold py-2.5 rounded-lg text-xs uppercase">Invia e Pubblica</button>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- MODALE AUTENTICAZIONE COMPLETO (Login, Registrazione & Reset Password) -->
-  <div x-show="showAuthModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-    <div @click.away="showAuthModal = false" class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl border border-gray-200 p-6 space-y-5 relative shadow-xl">
-      <button @click="showAuthModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-slate-900">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-      </button>
-
-      <!-- SE NON CONNESSO -->
-      <div x-show="!isLoggedIn" class="space-y-4">
-        <div class="text-center">
-          <img src="/logo.png?v=1" class="w-14 h-14 object-contain mx-auto mb-2" onerror="this.style.display='none'">
-          <h3 class="text-base font-extrabold text-slate-900" x-text="authMode === 'login' ? 'Accedi all\'App' : (authMode === 'register' ? 'Crea un Account' : 'Reimposta Password')"></h3>
-          <p class="text-xs text-gray-500" x-text="authMode === 'login' ? 'Segui i tuoi ragazzi e attiva le notifiche.' : (authMode === 'register' ? 'Registrati in pochi secondi.' : 'Inserisci la tua email per reimpostare.')"></p>
-        </div>
-
-        <form @submit.prevent="authMode === 'reset' ? handlePasswordReset() : handleEmailAuth()" class="space-y-3">
-          <input type="email" x-model="email" required placeholder="Inserisci l'email" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-xs focus:ring-1 focus:ring-red-500 focus:outline-none">
-          <template x-if="authMode !== 'reset'">
-            <input type="password" x-model="password" required placeholder="Inserisci password" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-xs focus:ring-1 focus:ring-red-500 focus:outline-none">
-          </template>
-          <button type="submit" :style="`background-color: ${themeColor}`" class="w-full text-white font-bold py-3 rounded-lg text-xs uppercase tracking-wider" x-text="authMode === 'login' ? 'Accedi' : (authMode === 'register' ? 'Registrati' : 'Invia Email di Reset')"></button>
-        </form>
-
-        <div x-show="authMode !== 'reset'" class="flex items-center my-4">
-          <div class="flex-grow border-t border-gray-200"></div>
-          <span class="mx-3 text-[10px] text-gray-400 font-bold uppercase">oppure</span>
-          <div class="flex-grow border-t border-gray-200"></div>
-        </div>
-
-        <button x-show="authMode !== 'reset'" @click="handleGoogleAuth()" class="w-full flex items-center justify-center space-x-2 border border-gray-200 hover:bg-gray-50 bg-white py-3 rounded-lg text-xs font-bold transition">
-          <svg class="w-4 h-4" viewBox="0 0 24 24">
-            <path fill="#EA4335" d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.48 14.99 1 12 1 7.35 1 3.4 3.65 1.5 7.5l3.86 3C6.3 7.57 8.94 5.04 12 5.04z"/>
-            <path fill="#4285F4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.27H12v4.51h6.46c-.29 1.48-1.14 2.73-2.4 3.56l3.73 2.9c2.18-2.02 3.7-5.02 3.7-8.7z"/>
-            <path fill="#FBBC05" d="M5.36 14.5c-.24-.72-.38-1.49-.38-2.5s.14-1.78.38-2.5L1.5 6.5C.54 8.42 0 10.51 0 12.75s.54 4.33 1.5 6.25l3.86-3z"/>
-            <path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.9l-3.73-2.9c-1.1.74-2.52 1.19-4.23 1.19-3.06 0-5.7-2.53-6.64-5.46L1.5 15.9C3.4 19.75 7.35 23 12 23z"/>
-          </svg>
-          <span class="text-slate-700">Accedi con Google</span>
-        </button>
-
-        <div class="text-center pt-2 text-xs">
-          <p class="text-gray-500" x-show="authMode === 'login'">Non hai un account? <a href="#" @click="authMode = 'register'" :style="`color: ${themeColor}`" class="font-bold underline">Registrati</a></p>
-          <p class="text-gray-500" x-show="authMode === 'register'">Hai già un account? <a href="#" @click="authMode = 'login'" :style="`color: ${themeColor}`" class="font-bold underline">Accedi</a></p>
-          <p class="text-gray-500 mt-2"><a href="#" @click="authMode = 'reset'" class="text-gray-400 hover:text-gray-600 underline">Password dimenticata?</a></p>
-        </div>
-      </div>
-
-      <!-- SE CONNESSO -->
-      <div x-show="isLoggedIn" class="space-y-4">
-        <div class="text-center">
-          <h3 class="text-base font-extrabold text-slate-900">Profilo Utente</h3>
-          <p class="text-xs text-gray-500 mt-1" x-text="'Connesso come: ' + userDisplayName"></p>
-        </div>
-        <button @click="logout()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 py-3 rounded-lg text-xs font-bold border border-red-200 uppercase tracking-wider">Disconnetti</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- NAVIGATION BAR IN BASSO (Mantiene l'app mobile-friendly) -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2.5 px-4 flex justify-around items-center z-50 max-w-md mx-auto rounded-t-xl shadow-lg">
-    <button @click="activeTab = 'home'" class="flex flex-col items-center transition" :style="activeTab === 'home' ? `color: ${themeColor}` : 'color: #94a3b8'">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-      <span class="text-[9px] font-bold mt-1">Home</span>
-    </button>
-    <button @click="activeTab = 'season'" class="flex flex-col items-center transition" :style="activeTab === 'season' ? `color: ${themeColor}` : 'color: #94a3b8'">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-      <span class="text-[9px] font-bold mt-1">Stagione</span>
-    </button>
-    <button @click="activeTab = 'roster'" class="flex flex-col items-center transition" :style="activeTab === 'roster' ? `color: ${themeColor}` : 'color: #94a3b8'">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-      <span class="text-[9px] font-bold mt-1">Roster</span>
-    </button>
-    <button @click="activeTab = 'standings'" class="flex flex-col items-center transition" :style="activeTab === 'standings' ? `color: ${themeColor}` : 'color: #94a3b8'">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-      <span class="text-[9px] font-bold mt-1">Classifica</span>
-    </button>
-    <!-- Pulsante Admin (visibile solo se l'utente connesso è l'Admin) -->
-    <button x-show="isAdmin" @click="activeTab = 'admin'" class="flex flex-col items-center transition animate-pulse" :style="activeTab === 'admin' ? `color: ${themeColor}` : 'color: #ea580c'">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-      <span class="text-[9px] font-bold mt-1">Admin</span>
-    </button>
-  </nav>
+    });
+</script>
 
 </body>
 </html>
