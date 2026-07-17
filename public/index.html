@@ -1,68 +1,373 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pannello Admin</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; }
-        .container { max-width: 500px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        input, button { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
-        button { background-color: #3b82f6; color: white; border: none; cursor: pointer; font-weight: bold; }
-        button:hover { background-color: #2563eb; }
-        #error-msg { color: red; font-size: 14px; text-align: center; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EPRO - Team Portal</title>
+  <!-- Tailwind CSS per un design moderno e pulito -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
 
-<div class="container">
-    <h2>Accedi come Admin</h2>
-    <form id="login-form">
-        <input type="text" id="username" placeholder="Username Admin" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button type="submit">Accedi</button>
-    </form>
-    <p id="error-msg"></p>
-</div>
+  <!-- HEADER / NAVIGAZIONE -->
+  <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-blue-600 text-white p-2 rounded-lg font-bold text-xl tracking-wider">EPRO</div>
+        <span class="text-lg font-semibold tracking-wide text-slate-300">Management Portal</span>
+      </div>
+      <nav class="flex flex-wrap justify-center gap-2">
+        <button onclick="switchTab('matches')" class="tab-btn bg-blue-600 px-4 py-2 rounded-lg font-medium text-sm transition">Partite</button>
+        <button onclick="switchTab('standings')" class="tab-btn bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-medium text-sm transition">Classifica</button>
+        <button onclick="switchTab('roster')" class="tab-btn bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-medium text-sm transition">Rosa</button>
+        <button onclick="switchTab('news')" class="tab-btn bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-medium text-sm transition">Notizie</button>
+        <button onclick="switchTab('stats')" class="tab-btn bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-medium text-sm transition">Statistiche</button>
+        <button onclick="toggleAdmin()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-medium text-sm transition ml-2">
+          <i class="fa-solid fa-lock"></i> Admin
+        </button>
+      </nav>
+    </div>
+  </header>
 
-<script>
-    // ⚠️ CONFIGURAZIONE URL BACKEND:
-    // Sostituisci con l'URL che ti assegna Render (es: 'https://miosito.onrender.com') se sei in produzione.
+  <main class="max-w-7xl mx-auto px-4 py-8">
+
+    <!-- ================= SEZIONE PARTITE ================= -->
+    <section id="tab-matches" class="tab-content">
+      <h2 class="text-2xl font-bold mb-6 border-b border-slate-700 pb-2"><i class="fa-solid fa-basketball text-blue-500 mr-2"></i> Calendario e Risultati</h2>
+      <div id="matches-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Caricato dinamicamente -->
+      </div>
+    </section>
+
+    <!-- ================= SEZIONE CLASSIFICA ================= -->
+    <section id="tab-standings" class="tab-content hidden">
+      <h2 class="text-2xl font-bold mb-6 border-b border-slate-700 pb-2"><i class="fa-solid fa-list-ol text-blue-500 mr-2"></i> Classifica Generale</h2>
+      <div class="bg-slate-800 rounded-xl overflow-hidden border border-slate-700">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-700 text-slate-300 uppercase text-xs tracking-wider">
+              <th class="py-4 px-6">Pos.</th>
+              <th class="py-4 px-6">Squadra</th>
+              <th class="py-4 px-6 text-right">Punti</th>
+            </tr>
+          </thead>
+          <tbody id="standings-list">
+            <!-- Caricato dinamicamente -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= SEZIONE ROSA ================= -->
+    <section id="tab-roster" class="tab-content hidden">
+      <h2 class="text-2xl font-bold mb-6 border-b border-slate-700 pb-2"><i class="fa-solid fa-users text-blue-500 mr-2"></i> La Squadra (Roster)</h2>
+      <div id="roster-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        <!-- Caricato dinamicamente -->
+      </div>
+    </section>
+
+    <!-- ================= SEZIONE NOTIZIE ================= -->
+    <section id="tab-news" class="tab-content hidden">
+      <h2 class="text-2xl font-bold mb-6 border-b border-slate-700 pb-2"><i class="fa-solid fa-newspaper text-blue-500 mr-2"></i> Ultime Notizie</h2>
+      <div id="news-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Caricato dinamicamente -->
+      </div>
+    </section>
+
+    <!-- ================= SEZIONE STATISTICHE ================= -->
+    <section id="tab-stats" class="tab-content hidden">
+      <h2 class="text-2xl font-bold mb-6 border-b border-slate-700 pb-2"><i class="fa-solid fa-chart-simple text-blue-500 mr-2"></i> Leader Statistiche</h2>
+      <div class="bg-slate-800 rounded-xl overflow-hidden border border-slate-700">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-700 text-slate-300 uppercase text-xs tracking-wider">
+              <th class="py-4 px-6">Giocatore</th>
+              <th class="py-4 px-6 text-center">Partite Giocate</th>
+              <th class="py-4 px-6 text-right">Punti Totali</th>
+            </tr>
+          </thead>
+          <tbody id="stats-list">
+            <!-- Caricato dinamicamente -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= PANNELLO AMMINISTRATORE (MODALE) ================= -->
+    <div id="admin-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex justify-center items-center p-4 overflow-y-auto">
+      <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div class="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-850">
+          <h3 class="text-xl font-bold text-red-500"><i class="fa-solid fa-unlock-keyhole mr-2"></i> Gestione Dati Admin</h3>
+          <button onclick="toggleAdmin()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
+        </div>
+        
+        <div class="p-6 space-y-8">
+          <!-- Form Partita -->
+          <form id="add-match-form" class="space-y-4 bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+            <h4 class="font-bold text-blue-400">Aggiungi Partita</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <input type="text" name="opponent" placeholder="Avversario" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500" required>
+              <input type="date" name="date" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500" required>
+              <input type="text" name="status" placeholder="Stato (es: Giocata, Prossima)" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+              <input type="number" name="ourScore" placeholder="Punteggio Nostro" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+              <input type="number" name="opponentScore" placeholder="Punteggio Avversario" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded text-sm transition">Salva Partita</button>
+          </form>
+
+          <!-- Form Classifica -->
+          <form id="add-standing-form" class="space-y-4 bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+            <h4 class="font-bold text-blue-400">Aggiungi Squadra in Classifica</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input type="text" name="team" placeholder="Nome Squadra" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500" required>
+              <input type="number" name="points" placeholder="Punti" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500" required>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded text-sm transition">Salva Squadra</button>
+          </form>
+
+          <!-- Form Roster -->
+          <form id="add-roster-form" enctype="multipart/form-data" class="space-y-4 bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+            <h4 class="font-bold text-blue-400">Aggiungi Giocatore</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              <input type="text" name="name" placeholder="Nome Giocatore" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500" required>
+              <input type="text" name="role" placeholder="Ruolo" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500" required>
+              <input type="number" name="number" placeholder="Numero" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+              <input type="text" name="category" placeholder="Categoria (es: U15, U17)" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-xs text-slate-400">Carica Immagine Giocatore</label>
+              <input type="file" name="image" class="text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded text-sm transition">Salva Giocatore</button>
+          </form>
+
+          <!-- Form Notizia -->
+          <form id="add-news-form" enctype="multipart/form-data" class="space-y-4 bg-slate-900/50 p-4 rounded-lg border border-slate-700">
+            <h4 class="font-bold text-blue-400">Crea Notizia</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <input type="text" name="title" placeholder="Titolo" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm col-span-2 focus:outline-none focus:border-blue-500" required>
+              <input type="text" name="tag" placeholder="Tag (es: Match, News)" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+            </div>
+            <textarea name="content" placeholder="Contenuto dell'articolo..." rows="3" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500" required></textarea>
+            <div class="flex flex-col gap-2">
+              <label class="text-xs text-slate-400">Carica Immagine Notizia</label>
+              <input type="file" name="image" class="text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded text-sm transition">Salva Notizia</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="bg-slate-800 border-t border-slate-700 py-6 mt-12 text-center text-sm text-slate-400">
+    <p>&copy; 2026 EPRO Team. Collegato in Cloud con Supabase.</p>
+  </footer>
+
+  <!-- SCRIPT FRONTEND -->
+  <script>
+    // URL dinamico del backend
     const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:5000'
-        : 'https://epro-webapp.onrender.com'; // <--- Incolla qui il link di Render
+      ? 'http://localhost:5000'
+      : 'https://epro-webapp.onrender.com';
 
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
+    // Gestione visualizzazione Tab
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-blue-600');
+        btn.classList.add('bg-slate-700', 'hover:bg-slate-600');
+      });
+      event.target.classList.remove('bg-slate-700', 'hover:bg-slate-600');
+      event.target.classList.add('bg-blue-600');
+    }
+
+    // Mostra/Nascondi Modale Admin
+    function toggleAdmin() {
+      const modal = document.getElementById('admin-modal');
+      modal.classList.toggle('hidden');
+    }
+
+    // Carica tutti i dati all'avvio dell'app
+    async function loadAllData() {
+      try {
+        const res = await fetch(`${API_URL}/api/data`);
+        const data = await res.json();
+        
+        renderMatches(data.matches || []);
+        renderStandings(data.standings || []);
+        renderRoster(data.roster || []);
+        renderNews(data.news || []);
+        renderStats(data.stats || []);
+      } catch (err) {
+        console.error("Errore caricamento dati:", err);
+      }
+    }
+
+    // Renderizza Partite
+    function renderMatches(matches) {
+      const list = document.getElementById('matches-list');
+      list.innerHTML = matches.map(m => `
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow flex flex-col justify-between relative group">
+          <button onclick="deleteItem('match', ${m.id})" class="absolute top-3 right-3 text-red-500 hover:text-red-400 hidden group-hover:block transition">&times; Elimina</button>
+          <div>
+            <div class="flex justify-between items-center text-xs text-slate-400 mb-3">
+              <span>${m.date}</span>
+              <span class="px-2 py-0.5 rounded-full ${m.status === 'Giocata' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}">${m.status || 'In arrivo'}</span>
+            </div>
+            <div class="flex items-center justify-between font-bold text-lg">
+              <span class="text-blue-400">EPRO</span>
+              <span class="text-2xl text-slate-300">${m.ourScore !== null ? m.ourScore : '-'}</span>
+            </div>
+            <div class="flex items-center justify-between font-bold text-lg mt-2">
+              <span class="text-slate-300">${m.opponent}</span>
+              <span class="text-2xl text-slate-300">${m.opponentScore !== null ? m.opponentScore : '-'}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Renderizza Classifica
+    function renderStandings(standings) {
+      const list = document.getElementById('standings-list');
+      list.innerHTML = standings.map((s, index) => `
+        <tr class="border-b border-slate-700 hover:bg-slate-750 transition group">
+          <td class="py-4 px-6 font-bold text-slate-400">${index + 1}</td>
+          <td class="py-4 px-6 font-medium text-slate-200 flex justify-between items-center">
+            ${s.team}
+            <button onclick="deleteItem('standings', ${s.id})" class="text-xs text-red-500 hover:text-red-400 hidden group-hover:block transition">Elimina</button>
+          </td>
+          <td class="py-4 px-6 font-bold text-blue-400 text-right text-lg">${s.points}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Renderizza Roster
+    function renderRoster(roster) {
+      const list = document.getElementById('roster-list');
+      list.innerHTML = roster.map(p => `
+        <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-md flex flex-col group relative">
+          <button onclick="deleteItem('roster', ${p.id})" class="absolute top-2 right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">&times;</button>
+          <div class="h-44 bg-slate-700 flex items-center justify-center overflow-hidden">
+            ${p.imageUrl ? `<img src="${API_URL}${p.imageUrl}" class="w-full h-full object-cover">` : `<i class="fa-solid fa-user text-5xl text-slate-500"></i>`}
+          </div>
+          <div class="p-3 text-center">
+            <h4 class="font-bold text-sm truncate">${p.name}</h4>
+            <p class="text-xs text-slate-400 mt-1">${p.role} ${p.number ? `#${p.number}` : ''}</p>
+            <span class="inline-block mt-2 bg-slate-700 text-[10px] uppercase font-bold px-2 py-0.5 rounded text-blue-400">${p.category || 'Generale'}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Renderizza Notizie
+    function renderNews(news) {
+      const list = document.getElementById('news-list');
+      list.innerHTML = news.map(n => `
+        <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg flex flex-col group relative">
+          <button onclick="deleteItem('news', ${n.id})" class="absolute top-3 right-3 bg-red-600 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition">Elimina</button>
+          <div class="h-48 bg-slate-700 flex items-center justify-center overflow-hidden">
+            ${n.imageUrl ? `<img src="${API_URL}${n.imageUrl}" class="w-full h-full object-cover">` : `<i class="fa-solid fa-image text-5xl text-slate-500"></i>`}
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-blue-400">${n.tag || 'Notizia'}</span>
+              <h3 class="font-bold text-lg mt-2 text-slate-100 leading-tight">${n.title}</h3>
+              <p class="text-sm text-slate-400 mt-3 line-clamp-3">${n.content}</p>
+            </div>
+            <p class="text-xs text-slate-500 mt-4">${n.date}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Renderizza Statistiche
+    function renderStats(stats) {
+      const list = document.getElementById('stats-list');
+      list.innerHTML = stats.map(s => `
+        <tr class="border-b border-slate-700 hover:bg-slate-750 transition group">
+          <td class="py-4 px-6 font-medium text-slate-200 flex justify-between items-center">
+            ${s.name}
+            <button onclick="deleteItem('stats', ${s.id})" class="text-xs text-red-500 hover:text-red-400 hidden group-hover:block transition">Elimina</button>
+          </td>
+          <td class="py-4 px-6 text-center text-slate-300 font-semibold">${s.games}</td>
+          <td class="py-4 px-6 font-bold text-blue-400 text-right text-lg">${s.totalPoints}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Elimina un elemento di qualsiasi entità
+    async function deleteItem(entity, id) {
+      if(!confirm("Sicuro di voler cancellare questo elemento?")) return;
+      try {
+        const res = await fetch(`${API_URL}/api/admin/${entity}/${id}`, { method: 'DELETE' });
+        if(res.ok) {
+          loadAllData(); // Ricarica tutti i dati aggiornati
+        }
+      } catch (err) {
+        console.error("Errore eliminazione:", err);
+      }
+    }
+
+    // Gestione Submit Form Generici (Senza file)
+    function setupStandardForm(formId, endpoint) {
+      document.getElementById(formId).addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const errorMsg = document.getElementById('error-msg');
-        
-        errorMsg.textContent = "";
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
 
         try {
-            const response = await fetch(`${API_URL}/api/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                alert('Accesso Admin riuscito!');
-                // Reindirizza l'utente o carica i dati protetti
-                console.log(result.user);
-            } else {
-                errorMsg.textContent = result.message || 'Errore durante l\'accesso.';
-            }
+          const res = await fetch(`${API_URL}/api/admin/${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if(res.ok) {
+            e.target.reset();
+            loadAllData();
+            alert("Salvato correttamente!");
+          }
         } catch (err) {
-            console.error(err);
-            errorMsg.textContent = 'Impossibile connettersi al server.';
+          console.error(err);
         }
-    });
-</script>
+      });
+    }
 
+    // Gestione Submit Form Complessi (Con File Upload)
+    function setupMultipartForm(formId, endpoint) {
+      document.getElementById(formId).addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+
+        try {
+          const res = await fetch(`${API_URL}/api/admin/${endpoint}`, {
+            method: 'POST',
+            body: formData // No header Content-Type, ci pensa il browser
+          });
+          if(res.ok) {
+            e.target.reset();
+            loadAllData();
+            alert("Salvato correttamente!");
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      });
+    }
+
+    // Inizializza i form dell'Admin Panel
+    setupStandardForm('add-match-form', 'match');
+    setupStandardForm('add-standing-form', 'standings');
+    setupMultipartForm('add-roster-form', 'roster');
+    setupMultipartForm('add-news-form', 'news');
+
+    // Avvio iniziale
+    window.onload = loadAllData;
+  </script>
 </body>
 </html>
